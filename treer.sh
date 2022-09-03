@@ -4,7 +4,7 @@ if [ $selectedpath != '' ]; then
   if [ -d $selectedpath ]; then
     tmux neww -c "$selectedpath" -n "$windowname"
   else
-    tmux neww -c "$selectedpath" -n "$windowname" "code $selectedpath"
+    code $selectedpath
   fi
 else
   echo "Selected directory not valid"
