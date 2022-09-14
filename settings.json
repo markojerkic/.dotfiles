@@ -53,6 +53,7 @@
     {
         "defaults": 
         {
+            "acrylicOpacity": 0.8,
             "bellStyle": "taskbar",
             "colorScheme": "Dracula",
             "cursorShape": "vintage",
@@ -62,8 +63,7 @@
             },
             "scrollbarState": "hidden",
             "startingDirectory": "C:\\Dev",
-            "useAcrylic": true,
-	    "opacity": 65
+            "useAcrylic": true
         },
         "list": 
         [
