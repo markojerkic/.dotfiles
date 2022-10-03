@@ -3,7 +3,11 @@ Import-Module posh-git
 Import-Module PSFzf
 
 # Search directory
-$startLocation = $args[0].ToString().Trim();
+$startLocation = $Env:StartLocation.Trim();
+if (-not($startLocation)) {
+    Write-Error "Export StartLocation env variable";
+    exit 1;
+}
 
 Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
 
