@@ -36,6 +36,9 @@ Set-Alias -Name fgdf -Value Invoke-FuzzyGitSwitchDeleteForce
 function Invoke-GitSwitch { git switch -c $args[0] }
 Set-Alias -Name gs -Value Invoke-GitSwitch 
 
+function Invoke-GitStatus { git status }
+Set-Alias -Name g -Value Invoke-GitAddPartial 
+
 function Invoke-GitAddPartial { git add -p . }
 Set-Alias -Name gap -Value Invoke-GitAddPartial 
 
