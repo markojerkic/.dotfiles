@@ -42,5 +42,5 @@ Set-Alias -Name g -Value Invoke-GitAddPartial
 function Invoke-GitAddPartial { git add -p . }
 Set-Alias -Name gap -Value Invoke-GitAddPartial 
 
-function Invoke-ProfileUpdate { curl "https://raw.githubusercontent.com/markojerkic/.dotfiles/main/Microsoft.Powershell_profile.ps1" > $PROFILE }
+function Invoke-ProfileUpdate { curl "https://raw.githubusercontent.com/markojerkic/.dotfiles/main/Microsoft.Powershell_profile.ps1" > $PROFILE; . $PROFILE }
 Set-Alias -Name up -Value Invoke-ProfileUpdate 
