@@ -18,7 +18,7 @@ Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward
 function Invoke-FuzzyEditDev {Invoke-FuzzyEdit $startLocation }
 Set-Alias -Name fe -Value Invoke-FuzzyEditDev
 
-function Invoke-FuzzySetLocationDev { get-childitem -Path $startLocation -name -depth 3 -Directory | Where-Object { -not($_.contains("\node_modules")) } | Where-Object { -not($_.contains("\.")) } | Where-Object { -not($_.contains("\yarn")) } | Invoke-Fzf | % { "$startLocation\$_" } | Set-Location }
+function Invoke-FuzzySetLocationDev { c:\stribog.exe -r "C:\" -f node_modules -f "." -f build -f target  -f AppData -f "android" -f "apache-maven-3.8.5" -f "DownLoadiTunes" -f "Drivers" -f "ESD" -f "Log" -f "MinGW" -f "PerfLogs" -f "Program Files" -f "Program Files (x86)" -f "pscale_0.93.0_windows_arm64" -f "Python27" -f "Python39" -f "Riot Games" -f "Ruby26-x64" -f "Windows" -f temp -f ProgramData -f "$" -f dist  | Invoke-fzf | Set-Location }
 Set-Alias -Name fs -Value Invoke-FuzzySetLocationDev
 
 function Invoke-FuzzyGitSwitch { git branch |  % {$_.replace("*","")} | % {$_.replace(" ","")} | Invoke-Fzf | % {git switch $_} }
