@@ -1,4 +1,4 @@
-selectedpath=`find ~/ -print | fzf`
+selectedpath=`/root/stribog -r /root -f . -f node_modules -f e2e -f build -f target -f dist | fzf`
 if [ $selectedpath != '' ]; then
   windowname=${selectedpath##*/}
   if [ -d $selectedpath ]; then
