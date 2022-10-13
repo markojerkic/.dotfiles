@@ -86,7 +86,7 @@ alias fgd="git branch -d \$(git branch | fzf | sed 's/ //g' | sed 's/*//')"
 alias fgr="git switch -c \$(git branch -r | fzf | sed 's/ //g' | sed 's/*//')"
 alias g="git status"
 alias gap="git add -p ."
-alias up="rm ~/stribog && python3 ./update-stribog.py lin"
+alias up="python3 update-stribog.py lin && unzip -b stribog.zip -d ./stribog && mv ./stribog/stribog ~/stribog"
 # User configuration
 export TERM=xterm-256color
 

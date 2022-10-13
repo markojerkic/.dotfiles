@@ -18,8 +18,9 @@ def download_binary(url, os_choice):
     file = requests.get(url)
     with open('stribog.zip', "wb") as z:
         z.write(file.content)
-        extract_zip()
-        move_binary(os_choice)
+        if os_choice == 'win':
+            extract_zip()
+            move_binary(os_choice)
 
 
 zipname_win = re.compile(r'^stribog_v(\d+\.\d+\.\d+)_x86_64-pc-windows-gnu\.zip$')
