@@ -78,11 +78,12 @@ plugins=(
 
 
 source $ZSH/oh-my-zsh.sh
-eval "$(oh-my-posh init zsh --config ~/.poshthemes/gruvbox.omp.json)"
+eval "$(oh-my-posh init zsh --config ~/.poshthemes/marcduiker.omp.json)"
 
 alias fs='cd $(~/stribog -r ~/ -r /mnt/c/Dev -f asset -f neovim -f resource -f test -f conf -f logs -f transformers_edm -f wordpress-app -f enrichment-w -f . -f node_modules -f e2e -f build -f target -f dist | fzf)'
 alias fg="git switch \$(git branch | fzf | sed 's/ //g' | sed 's/*//')"
 # User configuration
+export TERM=xterm-256color
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
