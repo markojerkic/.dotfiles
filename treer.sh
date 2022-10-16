@@ -1,4 +1,4 @@
-selectedpath=`/root/stribog -r /root -f . -f node_modules -f e2e -f build -f target -f dist | fzf`
+selectedpath=`~/stribog -u -i -r ~/dev -r  ~/.config/nvim -r /mnt/c/Dev -f asset  -f resource -f test -f conf -f logs -f .git -f .next -f .swc -f node_modules -f e2e -f build -f target -f dist | fzf`
 if [ $selectedpath != '' ]; then
   windowname=${selectedpath##*/}
   if [ -d $selectedpath ]; then
