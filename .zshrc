@@ -80,13 +80,13 @@ plugins=(
 source $ZSH/oh-my-zsh.sh
 eval "$(oh-my-posh init zsh --config ~/.poshthemes/marcduiker.omp.json)"
 
-alias fs='cd $(~/stribog -u -i -r ~/.dotfiles -r ~/dev -r /mnt/c/Dev -f asset -f neovim -f resource -f test -f conf -f logs -f transformers_edm -f wordpress-app -f enrichment-w -f .git -f .next -f .swc -f node_modules -f e2e -f build -f target -f dist | fzf)'
+alias fs='cd $(~/stribog -u -i  -r ~/dev -r /mnt/c/Dev -f asset  -f resource -f test -f conf -f logs -f transformers_edm -f wordpress-app -f enrichment-w -f .git -f .next -f .swc -f node_modules -f e2e -f build -f target -f dist | fzf)'
 alias fg="git switch \$(git branch | fzf | sed 's/ //g' | sed 's/*//')"
 alias fgd="git branch -d \$(git branch | fzf | sed 's/ //g' | sed 's/*//')"
 alias fgr="git switch -c \$(git branch -r | fzf | sed 's/ //g' | sed 's/*//')"
 alias g="git status"
 alias gap="git add -p ."
-alias up="python3 ~/.dotfiles/update-stribog.py lin && unzip -b ~/.dotfiles/stribog.zip -d ~/.dotfiles/stribog && mv ~/.dotfiles/stribog/stribog ~/stribog"
+alias up="python3 ~/dev/.dotfiles/update-stribog.py lin && unzip -b ~/dev/.dotfiles/stribog.zip -d ~/dev/.dotfiles/stribog && mv ~/dev/.dotfiles/stribog/stribog ~/stribog"
 # User configuration
 export TERM=xterm-256color
 
