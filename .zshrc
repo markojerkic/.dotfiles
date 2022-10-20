@@ -84,6 +84,7 @@ alias fs='cd $(~/stribog -u -i -r ~/dev -r  ~/.config/nvim -r /mnt/c/Dev -f asse
 alias fg="git switch \$(git branch | fzf | sed 's/ //g' | sed 's/*//')"
 alias fgd="git branch -d \$(git branch | fzf | sed 's/ //g' | sed 's/*//')"
 alias fgr="git switch -c \$(git branch -r | fzf | sed 's/ //g' | sed 's/*//')"
+alias gs="git switch -c \$1"
 alias g="git status"
 alias gap="git add -p ."
 alias up="python3 ~/dev/.dotfiles/update-stribog.py lin && unzip -b ~/dev/.dotfiles/stribog.zip -d ~/dev/.dotfiles/stribog && mv ~/dev/.dotfiles/stribog/stribog ~/stribog"
