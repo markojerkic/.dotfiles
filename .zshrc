@@ -78,12 +78,14 @@ plugins=(
 
 
 source $ZSH/oh-my-zsh.sh
-eval "$(oh-my-posh init zsh --config ~/.poshthemes/marcduiker.omp.json)"
+eval "$(oh-my-posh init zsh --config ~/.poshthemes/gruvbox.omp.json)"
+
+alias python=python3
 
 alias fs='cd $(~/stribog -u -i -r ~/dev -r  ~/.config/nvim -r /mnt/c/Dev -f asset  -f resource -f test -f conf -f logs -f .git -f .next -f .swc -f node_modules -f e2e -f build -f target -f dist | fzf)'
 alias fg="git switch \$(git branch | fzf | sed 's/ //g' | sed 's/*//')"
 alias fgd="git branch -d \$(git branch | fzf | sed 's/ //g' | sed 's/*//')"
-alias fgr="git switch -c \$(git branch -r | fzf | sed 's/ //g' | sed 's/*//')"
+alias fgr="git checkout \$(git branch -r | fzf | sed 's/ //g' | sed 's/*//') -t"
 alias gs="git switch -c \$1"
 alias g="git status"
 alias gap="git add -p ."
@@ -114,3 +116,11 @@ export TERM=xterm-256color
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+
+# Load Angular CLI autocompletion.
+source <(ng completion script)
