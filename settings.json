@@ -67,7 +67,6 @@
             },
             "opacity": 100,
             "scrollbarState": "hidden",
-            "startingDirectory": "C:\\Dev\\workspaces\\KULTURA",
             "useAcrylic": true
         },
         "list": 
@@ -78,7 +77,6 @@
                 "hidden": false,
                 "name": "PowerShell",
                 "source": "Windows.Terminal.PowershellCore",
-                "startingDirectory": "C:\\Dev\\workspaces\\KULTURA",
                 "tabTitle": "posh"
             },
             {
@@ -93,43 +91,12 @@
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
                 "hidden": true,
                 "name": "Windows PowerShell",
-                "startingDirectory": "C:\\Dev\\workspaces\\KULTURA"
-            },
-            {
-                "commandline": "%SystemRoot%\\System32\\cmd.exe",
-                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
-                "hidden": true,
-                "name": "Command Prompt"
             },
             {
                 "colorScheme": "Dracula",
                 "guid": "{07b52e3e-de2c-5db4-bd2d-ba144ed6c273}",
                 "hidden": true,
                 "name": "Ubuntu-20.04",
-                "source": "Windows.Terminal.Wsl"
-            },
-            {
-                "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
-                "hidden": true,
-                "name": "Azure Cloud Shell",
-                "source": "Windows.Terminal.Azure"
-            },
-            {
-                "guid": "{9127ea92-74a0-5f49-a12f-94c4b549e5db}",
-                "hidden": true,
-                "name": "Developer Command Prompt for VS 2019",
-                "source": "Windows.Terminal.VisualStudio"
-            },
-            {
-                "guid": "{c82d73fc-b363-599d-b2d9-ea2ee7c83abb}",
-                "hidden": false,
-                "name": "Developer PowerShell for VS 2019",
-                "source": "Windows.Terminal.VisualStudio"
-            },
-            {
-                "guid": "{e636fd95-8db6-56fc-969f-5647553fa92b}",
-                "hidden": true,
-                "name": "wsl-vpnkit",
                 "source": "Windows.Terminal.Wsl"
             },
             {
