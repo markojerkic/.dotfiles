@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ -t 0 ]; then
+	selected=$(find ~/Slike/WP -type f | grep -v ".git" | fzf )
+else
+	read selected
+fi
+echo $selected | xargs -I {} feh {} --bg-max
+echo $selected > ~/.bg-image
+betterlockscreen -u $(echo $selected) > /dev/null 2> /tmp/betterlock.log &
