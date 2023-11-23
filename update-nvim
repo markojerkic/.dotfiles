@@ -1,0 +1,45 @@
+#!/bin/sh
+
+sudo echo "This command requires sudo."
+
+## This is a shell script.
+# It starts with a shebang to indicate that the script should be executed using the /bin/sh shell.
+
+# Retrieve the download URL for the latest release of nvim.appimage from GitHub API.
+download_url=https://github.com/neovim/neovim/releases/download/stable/nvim.appimage
+# Use curl to make an HTTP request to the GitHub API for the latest release of neovim.
+# The response is piped through jq, a command-line JSON processor.
+# It filters out the download URL of the nvim.appimage asset and removes surrounding quotes.
+# The resulting URL is stored in the 'download_url' variable.
+
+# Download the nvim.appimage file using the retrieved URL and save it to /tmp directory.
+curl -o /tmp/nvim.appimage -L "$download_url"
+# Another curl command is used to download the appimage.
+# The '-o' option specifies the output file name and location.
+# The '-L' option follows redirects if the URL points to another location.
+
+# Move the downloaded appimage file from /tmp to /usr/local/bin with the name nvim.appimage.
+sudo mv /tmp/nvim.appimage /usr/local/bin/nvim.appimage
+# The 'mv' command is used to move the downloaded appimage to the desired directory.
+# This is where it will be accessed as 'nvim.appimage'.
+
+# Change the permissions of nvim.appimage to make it executable.
+sudo chmod u+x /usr/local/bin/nvim.appimage
+# The 'chmod' command is used to modify file permissions.
+# 'u+x' sets the execute permission for the owner of the file.
+
+# Create symbolic links for convenience.
+# ln -s /usr/local/bin/nvim.appimage /usr/local/bin/nvim
+# ln -s /usr/local/bin/nvim.appimage /usr/local/bin/vim
+sudo rm /usr/local/bin/nvim
+sudo rm /usr/local/bin/vim
+sudo cp /usr/local/bin/nvim.appimage /usr/local/bin/nvim
+sudo cp /usr/local/bin/nvim.appimage /usr/local/bin/vim
+
+sudo chmod u+x /usr/local/bin/nvim
+sudo chmod u+x /usr/local/bin/vim
+
+# Two symbolic links are created: one for 'nvim' and one for 'vim'.
+# This allows easy access to nvim using either 'nvim' or 'vim' command.
+
+# End of the script.

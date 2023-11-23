@@ -78,19 +78,16 @@ plugins=(
 
 
 source $ZSH/oh-my-zsh.sh
-eval "$(oh-my-posh init zsh --config ~/.poshthemes/gruvbox.omp.json)"
 
 alias python=python3
-alias vim=nvim
 
-alias fs='cd $(stribog -u -i -r ~/dev -r  ~/.config/nvim -r /mnt/c/Dev -f asset  -f .plugin -f resource -f test -f conf -f logs -f .git -f .next -f .swc -f node_modules -f e2e -f build -f target -f dist | fzf)'
+alias fs='cd $(stribog-select)'
 alias fg="git switch \$(git branch | fzf | sed 's/ //g' | sed 's/*//')"
 alias fgd="git branch -d \$(git branch | fzf | sed 's/ //g' | sed 's/*//')"
 alias fgr="git checkout \$(git branch -r | fzf | sed 's/ //g' | sed 's/*//') -t"
 alias gs="git switch -c \$1"
 alias g="git status"
 alias gap="git add -p ."
-alias up="python3 ~/dev/.dotfiles/update-stribog.py lin && unzip -b ~/dev/.dotfiles/stribog.zip -d ~/dev/.dotfiles/stribog && mv ~/dev/.dotfiles/stribog/stribog ~/stribog"
 # User configuration
 export TERM=xterm-256color
 

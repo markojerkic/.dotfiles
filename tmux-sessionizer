@@ -1,9 +1,9 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    selected=$(stribog -u -i -r ~/dev -r  ~/.config/nvim -r /mnt/c/Dev -f asset  -f .plugin -f resource -f test -f conf -f logs -f .git -f .next -f .swc -f node_modules -f e2e -f build -f target -f dist  | fzf)
+    selected=$(stribog-select)
 
 fi
 
