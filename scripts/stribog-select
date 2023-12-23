@@ -2,9 +2,7 @@
 
 stribog -i \
 	-r ~/dev \
-	-r ~/.config/nvim \
-	-r ~/.config/i3 \
-	-r ~/.config/i3status \
+	-r ~/Slike/WP \
 	-f .gradle  \
 	-f .mvn  \
 	-f asset  \
