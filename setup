@@ -1,9 +1,9 @@
 #!/bin/sh
 
 # make a symbolic link to the dotfiles
-sudo ln .tmux.conf ~/.tmux.conf
-sudo ln .gitconfig ~/.gitconfig
-sudo ln .zshrc ~/.zshrc
+ln -s ~/dev/.dotfiles/.tmux.conf ~/.tmux.conf
+ln -s ~/dev/.dotfiles/.gitconfig ~/.gitconfig
+ln -s ~/dev/.dotfiles/.zshrc ~/.zshrc
 
 ln -s ~/dev/.dotfiles/.config/nvim-config ~/.config/nvim
 
