@@ -1,0 +1,13 @@
+#!/bin/sh
+
+selected_value=$(echo "eDP\nHDMI-A-0" | fzf)
+
+if [ "$selected_value" = "eDP" ]; then
+    xrandr --output eDP --auto --same-as HDMI-A-0 --set TearFree on
+    xrandr --output HDMI-A-0 --off
+    echo "Gasimo HDMI, prilazimo isklj na laptop"
+else
+    xrandr --output HDMI-A-0 --auto --same-as eDP --set TearFree on
+    xrandr --output eDP --off
+    echo "Idemo direkt na televiziju"
+fi

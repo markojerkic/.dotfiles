@@ -3,8 +3,14 @@
 stribog -i \
 	-r ~/dev \
 	-r ~/.config/nvim \
+	-r ~/.config/i3 \
+	-r ~/.config/i3status \
+	-f .gradle  \
+	-f .mvn  \
 	-f asset  \
 	-f resource \
+	-f mythsim \
+	-f cmake \
 	-f test \
 	-f conf \
 	-f logs \

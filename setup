@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# make a symbolic link to the dotfiles
+# sudo ln -s ./nvim ~/.config/nvim
+sudo ln .tmux.conf ~/.tmux.conf
+sudo ln .gitconfig ~/.gitconfig
+sudo ln .zshrc ~/.zshrc
+

@@ -33,8 +33,8 @@ sudo chmod u+x /usr/local/bin/nvim.appimage
 # ln -s /usr/local/bin/nvim.appimage /usr/local/bin/vim
 sudo rm /usr/local/bin/nvim
 sudo rm /usr/local/bin/vim
-sudo cp /usr/local/bin/nvim.appimage /usr/local/bin/nvim
-sudo cp /usr/local/bin/nvim.appimage /usr/local/bin/vim
+sudo ln /usr/local/bin/nvim.appimage /usr/local/bin/nvim
+sudo ln /usr/local/bin/nvim.appimage /usr/local/bin/vim
 
 sudo chmod u+x /usr/local/bin/nvim
 sudo chmod u+x /usr/local/bin/vim
