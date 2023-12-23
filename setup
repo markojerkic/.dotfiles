@@ -1,11 +1,11 @@
 #!/bin/sh
 
 # make a symbolic link to the dotfiles
-# sudo ln -s ./nvim ~/.config/nvim
+sudo ln .tmux.conf ~/.tmux.conf
+sudo ln .gitconfig ~/.gitconfig
+sudo ln .zshrc ~/.zshrc
 
-# sudo ln .tmux.conf ~/.tmux.conf
-# sudo ln .gitconfig ~/.gitconfig
-# sudo ln .zshrc ~/.zshrc
+ln -s ~/dev/.dotfiles/.config/nvim-config ~/.config/nvim
 
 ln -s ~/dev/.dotfiles/.config/i3 ~/.config/i3
 ln -s ~/dev/.dotfiles/.config/i3status ~/.config/i3status
