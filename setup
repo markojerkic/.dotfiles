@@ -1,5 +1,15 @@
 #!/bin/sh
 
+# Delete the existing symbolic links
+rm -rf ~/.config/nvim
+rm -rf ~/.config/i3
+rm -rf ~/.config/i3status
+rm -rf ~/.config/compton
+
+rm ~/.zshrc
+rm ~/.gitconfig
+rm ~/.tmux.conf
+
 # make a symbolic link to the dotfiles
 ln -s ~/dev/.dotfiles/.tmux.conf ~/.tmux.conf
 ln -s ~/dev/.dotfiles/.gitconfig ~/.gitconfig
