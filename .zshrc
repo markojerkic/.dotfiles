@@ -135,4 +135,4 @@ export PATH="$PATH:/usr/local/go/bin"
 export PATH="$HOME/.local/share/fnm:$PATH"
 eval "`fnm env`"
 
-export PATH="$HOME/dev/.dotfiles:$PATH"
+export PATH="$HOME/dev/.dotfiles/scripts:$PATH"
