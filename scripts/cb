@@ -1,10 +1,14 @@
 #!/bin/sh
 
 if [ -t 0 ]; then
-	selected=$(find ~/Slike/WP -type f | grep -v ".git" | fzf )
+	selected=$(find ~/Slike/WP -maxdepth 1 -type f | grep -v ".git" | fzf )
 else
 	read selected
 fi
-echo $selected | xargs -I {} feh {} --bg-max
+
+# Compute the average color of the image as a hex value
+average_color=$(convert $selected -scale 1x1\! -format '%[pixel:u]' info:- | sed -e 's/srgb(\([0-9.]*\)%,\([0-9.]*\)%,\([0-9.]*\)%)/\1 \2 \3/' | awk '{printf "#%02x%02x%02x\n", $1*2.55, $2*2.55, $3*2.55}')
+
+feh --bg-max --image-bg "$average_color" "$selected"
 echo $selected > ~/.bg-image
 betterlockscreen -u $(echo $selected) > /dev/null 2> /tmp/betterlock.log &
