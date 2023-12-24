@@ -14,8 +14,12 @@ stribog -i \
 	-f logs \
 	-f .git \
 	-f .next \
+	-f .astro \
+	-f .settings \
 	-f .swc \
+	-f .idea \
 	-f node_modules \
+	-f bin \
 	-f e2e \
 	-f build \
 	-f target \
