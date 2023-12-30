@@ -27,4 +27,4 @@ echo $selected > ~/.bg-image
 screen_size=$(xdpyinfo | awk '/dimensions/ {print $2}')
 convert $selected -resize "$screen_size" -gravity center -extent "$screen_size" -background "$average_color" -flatten ~/lockscreen.png
 
-betterlockscreen -u ~/lockscreen.png > /dev/null &
+# nohup betterlockscreen -u ~/lockscreen.png > /dev/null 2>&1 &
