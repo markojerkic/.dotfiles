@@ -275,9 +275,9 @@ bindsym XF86AudioPrev exec playerctl previous
 bindsym $mod+Shift+x exec betterlockscreen -l dim
 bindsym $mod+Shift+m exec betterlockscreen -l dim -s
 
-exec --no-startup-id cat ~/.bg-image | cb
+exec --no-startup-id cb ~/.bg-image
 exec --no-startup-id compton
-exec --no-startup-id betterlockscreen -w dim -u $(cat ~/.bg-image)
+exec --no-startup-id betterlockscreen -u $(cat ~/.bg-image) > /dev/null 2> /tmp/betterlock.log &
 exec xinput set-prop "SYN3000:00 06CB:7F28 Touchpad" "libinput Tapping Enabled Default" 1
 
 ## Volume control

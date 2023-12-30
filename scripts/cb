@@ -1,9 +1,19 @@
 #!/bin/sh
 
-if [ -t 0 ]; then
-	selected=$(find ~/Slike/WP -maxdepth 1 -type f -name "*.jpg" | fzf )
+if [ "$#" -eq 1 ]; then
+    selected="$1"
 else
-	read selected
+    if [ -t 0 ]; then
+        selected=$(find ~/Slike/WP -maxdepth 1 -type f -name "*.jpg" | fzf)
+    else
+        read selected
+    fi
+fi
+
+# Check if the selected file exists
+if [ ! -f "$selected" ]; then
+    echo "Error: File not found: $selected"
+    exit 1
 fi
 
 # Compute the average color of the image as a hex value
@@ -13,4 +23,8 @@ average_color=$(convert $selected -scale 1x1\! -format '%[pixel:u]' info:- \
 
 feh --bg-max --image-bg "$average_color" "$selected"
 echo $selected > ~/.bg-image
-betterlockscreen -u $(echo $selected) > /dev/null 2> /tmp/betterlock.log &
+
+screen_size=$(xdpyinfo | awk '/dimensions/ {print $2}')
+convert $selected -resize "$screen_size" -gravity center -extent "$screen_size" -background "$average_color" -flatten ~/lockscreen.png
+
+betterlockscreen -u ~/lockscreen.png > /dev/null &

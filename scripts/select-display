@@ -11,3 +11,5 @@ else
     xrandr --output eDP --off
     echo "Idemo direkt na televiziju"
 fi
+
+cb $(cat ~/.bg-image)

@@ -16,17 +16,18 @@ general {
 	interval = 2
 }
 
+order += "wireless wlp2s0"
 order += "volume master"
 order += "load"
 order += "cpu_usage"
 order += "disk /"
 # order += "disk /media/media"
 # order += "ethernet eth0"
+order += "battery all"
 order += "tztime local"
 #order += "ipv6"
 #order += "run_watch DHCP"
 #order += "run_watch VPN"
-order += "wireless wlan0"
 
 volume master {
 	format = " ♪: %volume  "
@@ -37,12 +38,17 @@ volume master {
 	# format = "À %volume "
 }
 
+battery all {
+	format = "  %status %percentage %remaining "
+	integer_battery_capacity = true
+}
+
 load {
 	format = " Δ: %1min "
 }
 
 cpu_usage {
-	format = "  %usage "
+	format = "   %usage "
 }
 
 disk "/" {
@@ -53,9 +59,9 @@ disk "/media/media" {
 	format = " ¨ %avail:m "
 }
 
-wireless wlan0 {
-	format_up = " W: (%quality at %essid) %ip "
-	format_down = " ☡ WiFi "
+wireless wlp2s0 {
+	format_up = " 󰖩: (%quality at %essid, %bitrate) "
+	format_down = " 󰖪  WiFi "
 }
 
 ethernet eth0 {
@@ -79,6 +85,6 @@ run_watch VPN {
 tztime local {
 #	format = " %h-%d %H:%M ☰ "
 	# termsyn font
-	format = "   %d. %h, %H:%M ☰ "
+	format = "   %d. %h, 󰥔 %H:%M "
 }
 
