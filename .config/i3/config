@@ -273,7 +273,7 @@ bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
 
 bindsym $mod+Shift+x exec i3lock -i ~/lockscreen.png #betterlockscreen -l dim
-bindsym $mod+Shift+m exec i3lock -i ~/lockscreen.png # betterlockscreen -l dim -s
+bindsym $mod+Shift+m exec i3lock -i ~/lockscreen.png && systemctl suspend # betterlockscreen -l dim -s
 
 exec --no-startup-id cb ~/.bg-image
 exec --no-startup-id compton
