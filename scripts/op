@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Find Windows Terminal directory
+terminal_dir=$(find "$(wslpath $(wslvar USERPROFILE))/AppData/Local/Packages/" -maxdepth 1 -type d -name "Microsoft.WindowsTerminal*")
+
+# Construct path to settings.json
+settings_file="$terminal_dir/LocalState/settings.json"
+
+# Ensure write permissions
+chmod +w "$settings_file"
+
+# Use jq to modify the JSON and save to a temporary file
+opacity=$(cat $settings_file | jq '.profiles.list[2].backgroundImageOpacity')
+
+if [ $opacity -eq 0 ]; then
+    jq '.profiles.list[].backgroundImageOpacity = 0.3' "$settings_file" > temp_settings.json
+else
+    jq '.profiles.list[].backgroundImageOpacity = 0' "$settings_file" > temp_settings.json
+fi
+
+# Replace original settings.json with modified version
+mv temp_settings.json "$settings_file"
+
