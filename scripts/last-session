@@ -1,0 +1,8 @@
+#!/bin/bash
+
+last_session=$(tmux display-message -p '#{client_last_session}')
+current_session=$(tmux display-message -p '#{session_name}')
+
+tmux-sessionizer "$last_session"
+tmux kill-session -t "$current_session"
+
