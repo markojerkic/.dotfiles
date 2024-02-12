@@ -13,7 +13,7 @@ chmod +w "$settings_file"
 opacity=$(cat $settings_file | jq '.profiles.list[2].backgroundImageOpacity')
 
 if [ $opacity -eq 0 ]; then
-    jq '.profiles.list[].backgroundImageOpacity = 0.3' "$settings_file" > temp_settings.json
+    jq '.profiles.list[].backgroundImageOpacity = 0.2' "$settings_file" > temp_settings.json
 else
     jq '.profiles.list[].backgroundImageOpacity = 0' "$settings_file" > temp_settings.json
 fi
