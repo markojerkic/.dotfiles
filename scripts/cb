@@ -15,11 +15,7 @@ if [ ! -f "$selected" ]; then
     echo "Error: File not found: $selected"
     exit 1
 fi
-
-# Compute the average color of the image as a hex value
-average_color=$(convert $selected -scale 1x1\! -format '%[pixel:u]' info:- \
-	| sed -e 's/srgb(\([0-9.]*\)%,\([0-9.]*\)%,\([0-9.]*\)%)/\1 \2 \3/' \
-	| awk '{printf "#%02x%02x%02x\n", $1*2.55, $2*2.55, $3*2.55}')
+tmux select-window -n
 
 if [  -d /mnt/c/ ]; then
     terminal_dir=$(find "$(wslpath $(wslvar USERPROFILE))/AppData/Local/Packages/" -maxdepth 1 -type d -name "Microsoft.WindowsTerminal*")
@@ -32,11 +28,14 @@ if [  -d /mnt/c/ ]; then
     mv /tmp/wterminal.json "$settings_file"
 
 else
+    # Compute the average color of the image as a hex value
+    average_color=$(convert $selected -scale 1x1\! -format '%[pixel:u]' info:- \
+        | sed -e 's/srgb(\([0-9.]*\)%,\([0-9.]*\)%,\([0-9.]*\)%)/\1 \2 \3/' \
+        | awk '{printf "#%02x%02x%02x\n", $1*2.55, $2*2.55, $3*2.55}')
+
     feh --bg-max --image-bg "$average_color" "$selected"
     echo $selected > ~/.bg-image
 
     screen_size=$(xdpyinfo | awk '/dimensions/ {print $2}')
     convert $selected -resize "$screen_size" -gravity center -extent "$screen_size" -background "$average_color" -flatten ~/lockscreen.png
-
-    # nohup betterlockscreen -u ~/lockscreen.png > /dev/null 2>&1 &
 fi
