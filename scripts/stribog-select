@@ -5,6 +5,7 @@ stribog -i \
 	-r ~/Slike/WP \
 	-f .gradle  \
 	-f .mvn  \
+	-f .cache  \
 	-f asset  \
 	-f resource \
 	-f mythsim \
