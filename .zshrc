@@ -88,6 +88,8 @@ alias fgr="git checkout \$(git branch -r | fzf | sed 's/ //g' | sed 's/*//') -t"
 alias gs="git switch -c \$1"
 alias g="git status"
 alias gap="git add -p ."
+alias air="~/go/bin/air"
+
 # User configuration
 export TERM=xterm-256color
 
@@ -113,8 +115,21 @@ export TERM=xterm-256color
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
+export FLYCTL_INSTALL=$HOME/.fly
+export PATH=/bin:$HOME/.bun/bin:/run/user/1000/fnm_multishells/68466_1698600293936/bin:$HOME/.local/share/fnm:$HOME/.bun/bin:/run/user/1000/fnm_multishells/8710_1698250342932/bin:$HOME/.local/share/fnm:$HOME/.cargo/bin:$HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:$PATH
+
+export PATH="$HOME/.local/share/nvim/mason/packages/delve:$PATH"
+
 # fnm
 export PATH="$HOME/.local/share/fnm:$PATH"
 eval "`fnm env`"
 
 export PATH="$HOME/dev/.dotfiles/scripts:$PATH"
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+export PATH="$PATH:/usr/local/go/bin:$HOME/go/bin"
+
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+eval "$(gh completion -s zsh)"
