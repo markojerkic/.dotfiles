@@ -132,4 +132,3 @@ export PATH="$PATH:/usr/local/go/bin:$HOME/go/bin"
 
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
-eval "$(gh completion -s zsh)"
