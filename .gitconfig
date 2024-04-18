@@ -1,7 +1,7 @@
 [alias]
 	tree = log --graph --decorate --pretty=oneline --abbrev-commit
 [user]
-	name = Marko Jekrić
+	name = Marko Jerkić
 	email = markojerkic266@gmail.com
 [core]
 	longpaths = true
