@@ -4,6 +4,8 @@ stribog -i \
 	-r ~/dev \
 	-r ~/Slike/WP \
 	-f .gradle  \
+	-f .vscode  \
+	-f .angular  \
 	-f .mvn  \
 	-f .cache  \
 	-f asset  \
