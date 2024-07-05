@@ -1,7 +1,7 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": 
+    "actions":
     [
         {
             "command": "unbound",
@@ -12,20 +12,40 @@
             "keys": "ctrl+shift+w"
         },
         {
-            "command": "closePane",
+            "command": "unbound",
+            "keys": "ctrl+shift+q"
+        },
+        {
+            "command": "unbound",
+            "keys": "ctrl+q"
+        },
+        {
+            "command":
+            {
+                "action": "copy",
+                "singleLine": false
+            },
+            "keys": "ctrl+shift+c"
+        },
+        {
+            "command": "unbound",
             "keys": "ctrl+w"
+        },
+        {
+            "command": "closeWindow",
+            "keys": "ctrl+q"
         },
         {
             "command": "find",
             "keys": "ctrl+shift+f"
         },
         {
-            "command": 
-            {
-                "action": "copy",
-                "singleLine": false
+            "command": {
+                "action": "splitPane",
+                "split": "auto",
+                "splitMode": "duplicate"
             },
-            "keys": "ctrl+shift+c"
+            "keys": "alt+shift+d"
         },
         {
             "command": "paste",
@@ -34,85 +54,70 @@
         {
             "command": "togglePaneZoom",
             "keys": "ctrl+shift+z"
-        },
-        {
-            "command": "closeWindow",
-            "keys": "ctrl+q"
-        },
-        {
-            "command": 
-            {
-                "action": "splitPane",
-                "split": "auto",
-                "splitMode": "duplicate"
-            },
-            "keys": "alt+shift+d"
         }
     ],
     "copyFormatting": "none",
     "copyOnSelect": false,
-    "defaultProfile": "{59b72ad2-09f7-55ec-af87-65d062af8472}",
-    "launchMode": "maximized",
-    "profiles": 
-    {
-        "defaults": 
+    "defaultProfile": "{e5a83caa-4c73-52b3-ae6b-bc438d721ef9}",
+    "newTabMenu": [
         {
-            "bellStyle": "taskbar",
-            "colorScheme": "Dracula",
-            "cursorShape": "vintage",
-            "font": 
-            {
-                "face": "JetBrainsMonoNL NF",
-                "size": 9
-            },
-            "opacity": 100,
-            "scrollbarState": "hidden",
-            "useAcrylic": true
+            "type": "remainingProfiles"
+        }
+    ],
+    "profiles": {
+        "defaults": {
+            "backgroundImage": "desktopWallpaper",
+            "backgroundImageStretchMode": "uniform",
+            "colorScheme": "rose-pine",
+            "font": {
+                "face": "JetBrainsMonoNL Nerd Font"
+            }
         },
-        "list": 
+        "list":
         [
             {
-                "colorScheme": "Dracula",
-                "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
+                "backgroundImage": "\\\\wsl.localhost\\Ubuntu-22.04\\root\\Slike\\WP\\naruto_sumoned.jpg",
+                "backgroundImageOpacity": 0.0,
+                "guid": "{e5a83caa-4c73-52b3-ae6b-bc438d721ef9}",
                 "hidden": false,
-                "name": "PowerShell",
-                "source": "Windows.Terminal.PowershellCore",
-                "tabTitle": "posh"
+                "name": "Ubuntu 22.04.3 LTS",
+                "source": "CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc"
             },
             {
-                "colorScheme": "Catppuccin Mocha",
-                "guid": "{59b72ad2-09f7-55ec-af87-65d062af8472}",
-                "hidden": false,
-                "name": "Ubuntu 20.04.5 LTS",
-                "source": "CanonicalGroupLimited.Ubuntu20.04LTS_79rhkp1fndgsc"
-            },
-            {
+                "backgroundImage": "\\\\wsl.localhost\\Ubuntu-22.04\\root\\Slike\\WP\\naruto_sumoned.jpg",
+                "backgroundImageOpacity": 0.0,
                 "commandline": "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
-                "hidden": true,
-                "name": "Windows PowerShell",
+                "hidden": false,
+                "name": "Windows PowerShell"
             },
             {
-                "colorScheme": "Dracula",
-                "guid": "{07b52e3e-de2c-5db4-bd2d-ba144ed6c273}",
-                "hidden": true,
-                "name": "Ubuntu-20.04",
+                "backgroundImage": "\\\\wsl.localhost\\Ubuntu-22.04\\root\\Slike\\WP\\naruto_sumoned.jpg",
+                "backgroundImageOpacity": 0.0,
+                "commandline": "%SystemRoot%\\System32\\cmd.exe",
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                "hidden": false,
+                "name": "Command Prompt"
+            },
+            {
+                "backgroundImage": "\\\\wsl.localhost\\Ubuntu-22.04\\root\\Slike\\WP\\naruto_sumoned.jpg",
+                "backgroundImageOpacity": 0.0,
+                "guid": "{3b24612a-a3af-5f2c-8994-981fda4cf78e}",
+                "hidden": false,
+                "name": "vpn",
                 "source": "Windows.Terminal.Wsl"
             },
             {
-                "colorScheme": "One Half Dark",
-                "commandline": "\"C:\\Program Files\\PowerShell\\7\\pwsh.exe\"",
-                "elevate": true,
-                "guid": "{4ae4c8e9-59d3-46d3-b755-3d9df70f8345}",
-                "hidden": false,
-                "icon": "ms-appx:///ProfileIcons/pwsh.png",
-                "name": "PowerShell Admin",
-                "startingDirectory": "C:\\Dev\\workspaces\\KULTURA",
-                "tabTitle": "posh"
+                "backgroundImage": "\\\\wsl.localhost\\Ubuntu-22.04\\root\\Slike\\WP\\naruto_sumoned.jpg",
+                "backgroundImageOpacity": 0.0,
+                "guid": "{17bf3de4-5353-5709-bcf9-835bd952a95e}",
+                "hidden": true,
+                "name": "Ubuntu-22.04",
+                "source": "Windows.Terminal.Wsl"
             }
         ]
     },
-    "schemes": 
+    "schemes":
     [
         {
             "background": "#0C0C0C",
@@ -161,52 +166,6 @@
             "yellow": "#C19C00"
         },
         {
-            "background": "#1E1E2E",
-            "black": "#45475A",
-            "blue": "#89B4FA",
-            "brightBlack": "#585B70",
-            "brightBlue": "#89B4FA",
-            "brightCyan": "#94E2D5",
-            "brightGreen": "#A6E3A1",
-            "brightPurple": "#F5C2E7",
-            "brightRed": "#F38BA8",
-            "brightWhite": "#A6ADC8",
-            "brightYellow": "#F9E2AF",
-            "cursorColor": "#F5E0DC",
-            "cyan": "#94E2D5",
-            "foreground": "#CDD6F4",
-            "green": "#A6E3A1",
-            "name": "Catppuccin Mocha",
-            "purple": "#F5C2E7",
-            "red": "#F38BA8",
-            "selectionBackground": "#585B70",
-            "white": "#BAC2DE",
-            "yellow": "#F9E2AF"
-        },
-        {
-            "background": "#1E1F29",
-            "black": "#000000",
-            "blue": "#BD93F9",
-            "brightBlack": "#555555",
-            "brightBlue": "#BD93F9",
-            "brightCyan": "#8BE9FD",
-            "brightGreen": "#50FA7B",
-            "brightPurple": "#FF79C6",
-            "brightRed": "#FF5555",
-            "brightWhite": "#FFFFFF",
-            "brightYellow": "#F1FA8C",
-            "cursorColor": "#BBBBBB",
-            "cyan": "#8BE9FD",
-            "foreground": "#F8F8F2",
-            "green": "#50FA7B",
-            "name": "Dracula",
-            "purple": "#FF79C6",
-            "red": "#FF5555",
-            "selectionBackground": "#44475A",
-            "white": "#BBBBBB",
-            "yellow": "#F1FA8C"
-        },
-        {
             "background": "#282C34",
             "black": "#282C34",
             "blue": "#61AFEF",
@@ -248,7 +207,7 @@
             "name": "One Half Light",
             "purple": "#A626A4",
             "red": "#E45649",
-            "selectionBackground": "#FFFFFF",
+            "selectionBackground": "#4F525D",
             "white": "#FAFAFA",
             "yellow": "#C18301"
         },
@@ -294,7 +253,7 @@
             "name": "Solarized Light",
             "purple": "#D33682",
             "red": "#DC322F",
-            "selectionBackground": "#FFFFFF",
+            "selectionBackground": "#073642",
             "white": "#EEE8D5",
             "yellow": "#B58900"
         },
@@ -340,7 +299,7 @@
             "name": "Tango Light",
             "purple": "#75507B",
             "red": "#CC0000",
-            "selectionBackground": "#FFFFFF",
+            "selectionBackground": "#555753",
             "white": "#D3D7CF",
             "yellow": "#C4A000"
         },
@@ -360,7 +319,7 @@
             "cyan": "#3A96DD",
             "foreground": "#FFFFFF",
             "green": "#26A269",
-            "name": "Ubuntu-20.04-ColorScheme",
+            "name": "Ubuntu-22.04-ColorScheme",
             "purple": "#881798",
             "red": "#C21A23",
             "selectionBackground": "#FFFFFF",
@@ -389,7 +348,53 @@
             "selectionBackground": "#FFFFFF",
             "white": "#C0C0C0",
             "yellow": "#808000"
+        },
+        {
+            "background": "#191724",
+            "black": "#26233A",
+            "blue": "#9CCFD8",
+            "brightBlack": "#6E6A86",
+            "brightBlue": "#9CCFD8",
+            "brightCyan": "#EBBCBA",
+            "brightGreen": "#31748F",
+            "brightPurple": "#C4A7E7",
+            "brightRed": "#EB6F92",
+            "brightWhite": "#E0DEF4",
+            "brightYellow": "#F6C177",
+            "cursorColor": "#555169",
+            "cyan": "#EBBCBA",
+            "foreground": "#E0DEF4",
+            "green": "#31748F",
+            "name": "rose-pine",
+            "purple": "#C4A7E7",
+            "red": "#EB6F92",
+            "selectionBackground": "#2A2837",
+            "white": "#E0DEF4",
+            "yellow": "#F6C177"
+        },
+        {
+            "background": "#232136",
+            "black": "#393552",
+            "blue": "#9CCFD8",
+            "brightBlack": "#817C9C",
+            "brightBlue": "#9CCFD8",
+            "brightCyan": "#EA9A97",
+            "brightGreen": "#3E8FB0",
+            "brightPurple": "#C4A7E7",
+            "brightRed": "#EB6F92",
+            "brightWhite": "#E0DEF4",
+            "brightYellow": "#F6C177",
+            "cursorColor": "#59546D",
+            "cyan": "#EA9A97",
+            "foreground": "#E0DEF4",
+            "green": "#3E8FB0",
+            "name": "rose-pine-moon",
+            "purple": "#C4A7E7",
+            "red": "#EB6F92",
+            "selectionBackground": "#312F44",
+            "white": "#E0DEF4",
+            "yellow": "#F6C177"
         }
     ],
-    "theme": "dark"
+    "themes": []
 }

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Find Windows Terminal directory
+terminal_dir=$(find "$(wslpath $(wslvar USERPROFILE))/AppData/Local/Packages/" -maxdepth 1 -type d -name "Microsoft.WindowsTerminal*")
+
+# Construct path to settings.json
+settings_file="$terminal_dir/LocalState/settings.json"
+
+echo $settings_file
+
+# Ensure write permissions
+chmod +w "$settings_file"
+
+echo $(cat ~/dev/.dotfiles/settings.json) > $settings_file

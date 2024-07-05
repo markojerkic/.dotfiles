@@ -5,5 +5,6 @@
 	email = markojerkic266@gmail.com
 [core]
 	longpaths = true
+	editor = nvim
 [credential]
 	helper = store
