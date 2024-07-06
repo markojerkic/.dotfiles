@@ -84,6 +84,7 @@ alias python=python3
 alias fs='cd $(stribog-select)'
 alias fg="git switch \$(git branch | fzf | sed 's/ //g' | sed 's/*//')"
 alias fgd="git branch -d \$(git branch | fzf | sed 's/ //g' | sed 's/*//')"
+alias fgD="git branch -D \$(git branch | fzf | sed 's/ //g' | sed 's/*//')"
 alias fgr="git checkout \$(git branch -r | fzf | sed 's/ //g' | sed 's/*//') -t"
 alias gs="git switch -c \$1"
 alias g="git status"
@@ -129,6 +130,8 @@ export PATH="$HOME/dev/.dotfiles/scripts:$PATH"
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
 export PATH="$PATH:/usr/local/go/bin:$HOME/go/bin"
+
+export PATH="$PATH:$HOME/.fly/bin"
 
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 

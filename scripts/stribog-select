@@ -3,6 +3,7 @@
 stribog -i \
 	-r ~/dev \
 	-r ~/Slike/WP \
+	-r ~/Preuzimanja \
 	-f .gradle  \
 	-f .vscode  \
 	-f .angular  \
