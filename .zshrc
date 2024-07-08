@@ -81,6 +81,7 @@ source $ZSH/oh-my-zsh.sh
 
 alias python=python3
 
+alias mvn8='JAVA_HOME=/root/.sdkman/candidates/java/8.0.392-zulu mvn'
 alias fs='cd $(stribog-select)'
 alias fg="git switch \$(git branch | fzf | sed 's/ //g' | sed 's/*//')"
 alias fgd="git branch -d \$(git branch | fzf | sed 's/ //g' | sed 's/*//')"
