@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+
+# Function to check for errors and exit if any
+check_error() {
+  if [ $? -ne 0 ]; then
+    echo "An error occurred. Exiting..."
+    exit 1
+  fi
+}
+
+# Function to find the latest version of Go
+get_latest_go_version() {
+  LATEST_VERSION=$(curl -s https://golang.org/VERSION?m=text)
+  check_error
+  echo $LATEST_VERSION
+}
+
+# Function to get the current installed Go version
+get_current_go_version() {
+  if command -v go &> /dev/null; then
+    CURRENT_VERSION=$(go version | awk '{print $3}')
+    check_error
+    echo $CURRENT_VERSION
+  else
+    echo "none"
+  fi
+}
+
+# Function to install Go
+install_go() {
+  VERSION=$1
+  PLATFORM=$2
+  ARCH=$3
+
+  DOWNLOAD_URL="https://dl.google.com/go/${VERSION}.${PLATFORM}-${ARCH}.tar.gz"
+  wget $DOWNLOAD_URL -O /tmp/go.tar.gz
+  check_error
+
+  sudo tar -C /usr/local -xzf /tmp/go.tar.gz
+  check_error
+
+  rm /tmp/go.tar.gz
+  check_error
+
+  echo "Go ${VERSION} installed successfully."
+}
+
+# Function to update environment variables
+update_env_variables() {
+  echo "Updating environment variables..."
+
+  if ! grep -q "/usr/local/go/bin" ~/.profile; then
+    echo "export PATH=\$PATH:/usr/local/go/bin" >> ~/.profile
+  fi
+
+  source ~/.profile
+
+  echo "Environment variables updated."
+}
+
+# Main script
+echo "Starting Go upgrade process..."
+
+# Get the latest Go version
+LATEST_VERSION=$(get_latest_go_version)
+echo "Latest Go version: $LATEST_VERSION"
+
+# Get the current Go version
+CURRENT_VERSION=$(get_current_go_version)
+echo "Current Go version: $CURRENT_VERSION"
+
+# Check if the current version is the latest version
+if [ "$CURRENT_VERSION" == "$LATEST_VERSION" ]; then
+  echo "Go is already up-to-date."
+  exit 0
+fi
+
+# Determine platform and architecture
+PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
+ARCH=$(uname -m)
+if [ "$ARCH" == "x86_64" ]; then
+  ARCH="amd64"
+elif [ "$ARCH" == "aarch64" ]; then
+  ARCH="arm64"
+else
+  ARCH="386"
+fi
+
+echo "Platform: $PLATFORM"
+echo "Architecture: $ARCH"
+
+# Remove any existing Go installation
+sudo rm -rf /usr/local/go
+check_error
+
+# Install the latest Go version
+install_go $LATEST_VERSION $PLATFORM $ARCH
+
+# Update environment variables
+update_env_variables
+
+echo "Go upgrade process completed. Please restart your terminal or run '
+,
