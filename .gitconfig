@@ -6,5 +6,6 @@
 [core]
 	longpaths = true
 	editor = nvim
+	autocrlf = input
 [credential]
 	helper = store
