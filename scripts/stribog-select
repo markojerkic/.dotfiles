@@ -6,6 +6,7 @@ stribog -i \
 	-r ~/Preuzimanja \
 	-f .gradle  \
 	-f .vscode  \
+    -f .svelte-kit \
 	-f .angular  \
 	-f .mvn  \
 	-f .cache  \

@@ -74,6 +74,7 @@ plugins=(
         git
         zsh-autosuggestions
         zsh-shift-select
+        asdf
 )
 
 
@@ -136,3 +137,10 @@ export PATH="$PATH:$HOME/.fly/bin"
 
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
+# pnpm
+export PNPM_HOME="/home/marko/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
