@@ -15,7 +15,10 @@ if [ ! -f "$selected" ]; then
     echo "Error: File not found: $selected"
     exit 1
 fi
-tmux select-window -n
+
+if [ "$#" -neq 1 ]; then
+    tmux select-window -n
+fi
 
 if [  -d /mnt/c/ ]; then
     terminal_dir=$(find "$(wslpath $(wslvar USERPROFILE))/AppData/Local/Packages/" -maxdepth 1 -type d -name "Microsoft.WindowsTerminal*")
