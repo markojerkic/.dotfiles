@@ -1,5 +1,5 @@
 [alias]
-	tree = log --graph --decorate --pretty=oneline --abbrev-commit
+	tree = log --oneline --graph --decorate --all
 [user]
 	name = Marko Jerkić
 	email = markojerkic266@gmail.com
