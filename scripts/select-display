@@ -9,7 +9,7 @@ if [ "$selected_value" = "eDP" ]; then
 else
     xrandr --output HDMI-A-0 --auto --same-as eDP --set TearFree on
     xrandr --output eDP --off
-    echo "Idemo direkt na televiziju"
+    echo "Idemo na HDMI"
 fi
 
 cb $(cat ~/.bg-image)
