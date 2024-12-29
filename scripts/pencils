@@ -1,23 +1,36 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
-# Find Windows Terminal directory
-terminal_dir=$(find "$(wslpath $(wslvar USERPROFILE))/AppData/Local/Packages/" -maxdepth 1 -type d -name "Microsoft.WindowsTerminal*")
+if [ -d /mnt/c/ ]; then
+    # Find Windows Terminal directory
+    terminal_dir=$(find "$(wslpath $(wslvar USERPROFILE))/AppData/Local/Packages/" -maxdepth 1 -type d -name "Microsoft.WindowsTerminal*")
 
-# Construct path to settings.json
-settings_file="$terminal_dir/LocalState/settings.json"
+    # Construct path to settings.json
+    settings_file="$terminal_dir/LocalState/settings.json"
 
-# Ensure write permissions
-chmod +w "$settings_file"
+    # Ensure write permissions
+    chmod +w "$settings_file"
 
-# Use jq to modify the JSON and save to a temporary file
-opacity=$(cat $settings_file | jq '.profiles.list[2].backgroundImageOpacity')
+    # Use jq to modify the JSON and save to a temporary file
+    opacity=$(cat $settings_file | jq '.profiles.list[2].backgroundImageOpacity')
 
-if [ "$opacity" -eq "0" ]; then
-    jq '.profiles.list[].backgroundImageOpacity = 0.2' "$settings_file" > temp_settings.json
+    if [ "$opacity" -eq "0" ]; then
+        jq '.profiles.list[].backgroundImageOpacity = 0.2' "$settings_file" > temp_settings.json
+    else
+        jq '.profiles.list[].backgroundImageOpacity = 0' "$settings_file" > temp_settings.json
+    fi
+
+    # Replace original settings.json with modified version
+    mv temp_settings.json "$settings_file"
 else
-    jq '.profiles.list[].backgroundImageOpacity = 0' "$settings_file" > temp_settings.json
-fi
+    # change line background-opacity in ~/dev/.dotfiles/.config/ghostty/config
+    # if not 1, then set 0.85, else 1
+    opacity=$(cat ~/dev/.dotfiles/.config/ghostty/config | grep background-opacity | awk '{print $2}')
 
-# Replace original settings.json with modified version
-mv temp_settings.json "$settings_file"
+    if [ "$opacity" -eq "1" ]; then
+        sed -i 's/background-opacity 1/background-opacity 0.85/' ~/dev/.dotfiles/.config/ghostty/config
+    else
+        sed -i 's/background-opacity 0.85/background-opacity 1/' ~/dev/.dotfiles/.config/ghostty/config
+    fi
+
+fi
 
