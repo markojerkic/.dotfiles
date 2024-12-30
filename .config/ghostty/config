@@ -2,5 +2,6 @@ theme = rose-pine-moon
 fullscreen = false
 background-opacity = 0.85
 gtk-titlebar = false
+mouse-hide-while-typing = true
 
 keybind=ctrl+ć=reload_config
