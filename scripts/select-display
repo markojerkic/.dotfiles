@@ -1,15 +1,28 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-selected_value=$(echo "eDP\nHDMI-A-0" | fzf)
+# Use fzf to select a display output
+selected_value=$(echo -e "eDP\nHDMI-A-0" | fzf)
 
 if [ "$selected_value" = "eDP" ]; then
+    # Configure xrandr for laptop display
     xrandr --output eDP --auto --same-as HDMI-A-0 --set TearFree on
     xrandr --output HDMI-A-0 --off
     echo "Gasimo HDMI, prilazimo isklj na laptop"
-else
+elif [ "$selected_value" = "HDMI-A-0" ]; then
+    # Configure xrandr for external HDMI display
     xrandr --output HDMI-A-0 --auto --same-as eDP --set TearFree on
     xrandr --output eDP --off
     echo "Idemo na HDMI"
+else
+    echo "No selection made. Exiting."
+    exit 1
 fi
 
-cb $(cat ~/.bg-image)
+# Set the background image using the custom command
+if [ -f ~/.bg-image ]; then
+    cb "$(cat ~/.bg-image)"
+else
+    echo "Error: Background image file not found at ~/.bg-image"
+    exit 1
+fi
+

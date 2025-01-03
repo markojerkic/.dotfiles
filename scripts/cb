@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 if [ "$#" -eq 1 ]; then
     selected="$1"
@@ -16,29 +16,27 @@ if [ ! -f "$selected" ]; then
     exit 1
 fi
 
-if [ "$#" -neq 1 ]; then
+if [ "$#" -ne 1 ]; then
     tmux select-window -n
 fi
 
-if [  -d /mnt/c/ ]; then
-    terminal_dir=$(find "$(wslpath $(wslvar USERPROFILE))/AppData/Local/Packages/" -maxdepth 1 -type d -name "Microsoft.WindowsTerminal*")
-    settings_file=$(echo "$terminal_dir/LocalState/settings.json")
+if [ -d /mnt/c/ ]; then
+    terminal_dir=$(find "$(wslpath "$(wslvar USERPROFILE)")/AppData/Local/Packages/" -maxdepth 1 -type d -name "Microsoft.WindowsTerminal*")
+    settings_file="$terminal_dir/LocalState/settings.json"
     chmod +w "$settings_file"
-    echo $settings_file \
-        | xargs -I {} cat {} \
-        | jq --arg new_image "$(echo $selected | xargs -I {} wslpath -w {} | sed 's/\\/\\/g')" \
+    cat "$settings_file" \
+        | jq --arg new_image "$(wslpath -w "$selected" | sed 's/\\/\\\\/g')" \
             '.profiles.list[].backgroundImage = $new_image' > /tmp/wterminal.json
     mv /tmp/wterminal.json "$settings_file"
-
 else
     # Compute the average color of the image as a hex value
-    average_color=$(convert $selected -scale 1x1\! -format '%[pixel:u]' info:- \
+    average_color=$(convert "$selected" -scale 1x1\! -format '%[pixel:u]' info:- \
         | sed -e 's/srgb(\([0-9.]*\)%,\([0-9.]*\)%,\([0-9.]*\)%)/\1 \2 \3/' \
         | awk '{printf "#%02x%02x%02x\n", $1*2.55, $2*2.55, $3*2.55}')
 
     feh --bg-max --image-bg "$average_color" "$selected"
-    echo $selected > ~/.bg-image
+    echo "$selected" > ~/.bg-image
 
     screen_size=$(xdpyinfo | awk '/dimensions/ {print $2}')
-    convert $selected -resize "$screen_size" -gravity center -extent "$screen_size" -background "$average_color" -flatten ~/lockscreen.png
+    convert "$selected" -resize "$screen_size" -gravity center -extent "$screen_size" -background "$average_color" -flatten ~/lockscreen.png
 fi
