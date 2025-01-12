@@ -9,6 +9,8 @@ stribog -i \
     -f .svelte-kit \
 	-f .angular  \
 	-f .mvn  \
+	-f zig-out  \
+	-f gradle  \
 	-f .cache  \
 	-f asset  \
 	-f resource \
