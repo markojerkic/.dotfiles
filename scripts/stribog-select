@@ -1,7 +1,14 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+# Flag -t "path" is for target directory
+if [[ $# -eq 2 ]]; then
+    target=$2
+else
+    target=~/dev
+fi
 
 dirs=$(stribog -i \
-	-r ~/dev \
+    -r $target \
 	-r ~/Slike/WP \
 	-r ~/Preuzimanja \
 	-f .gradle  \
