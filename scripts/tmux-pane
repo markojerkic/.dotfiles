@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+selected=$(stribog-select -t)
+
+# Open dir in new tmux page with name of the dir
+selected_name=$(basename "$selected" | tr . _)
+tmux new-window -n $selected_name -c "$selected"

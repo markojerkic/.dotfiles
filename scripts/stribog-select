@@ -1,6 +1,6 @@
 #!/bin/sh
 
-stribog -i \
+dirs=$(stribog -i \
 	-r ~/dev \
 	-r ~/Slike/WP \
 	-r ~/Preuzimanja \
@@ -30,4 +30,6 @@ stribog -i \
 	-f e2e \
 	-f build \
 	-f target \
-	-f dist | fzf
+    -f dist)
+
+echo "$dirs" | fzf --reverse --preview 'echo {}' --preview-window=right:30%:wrap --preview="ls {}"
