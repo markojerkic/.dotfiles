@@ -4,7 +4,13 @@ if [ "$#" -eq 1 ]; then
     selected="$1"
 else
     if [ -t 0 ]; then
-        selected=$(find ~/Slike/WP -maxdepth 1 -type f -name "*.jpg" | fzf)
+        # Available with is 60% of the terminal width
+        available_width=$(($(tput cols) * 60 / 100))
+        available_height=$(tput lines)
+        width_x_height="${available_width}x${available_height}"
+
+        selected=$(find ~/Slike/WP -maxdepth 1 -type f -name "*.jpg" | \
+            fzf --preview "chafa {} --size $width_x_height --symbols vhalf --stretch" --preview-window=right:70%:wrap)
     else
         read selected
     fi
