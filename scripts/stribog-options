@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+# Flag -t "path" is for target directory
+if [[ $# -eq 2 ]]; then
+    target=$2
+else
+    target=~/dev
+fi
+stribog -i \
+    -m 4 \
+    -r $target \
+	-r ~/Slike/WP \
+	-r ~/Preuzimanja \
+	-f .gradle  \
+	-f .vscode  \
+	-f .server  \
+	-f .nx  \
+    -f .svelte-kit \
+	-f .angular  \
+	-f .mvn  \
+	-f zig-out  \
+    -f __repository \
+	-f gradle  \
+	-f .cache  \
+	-f asset  \
+	-f resource \
+	-f mythsim \
+	-f cmake \
+	-f test \
+	-f conf \
+	-f logs \
+	-f .git \
+	-f .next \
+	-f .astro \
+	-f .settings \
+	-f .swc \
+	-f .idea \
+	-f node_modules \
+	-f bin \
+	-f e2e \
+	-f build \
+	-f target \
+    -f dist

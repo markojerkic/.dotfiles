@@ -7,36 +7,6 @@ else
     target=~/dev
 fi
 
-dirs=$(stribog -i \
-    -r $target \
-	-r ~/Slike/WP \
-	-r ~/Preuzimanja \
-	-f .gradle  \
-	-f .vscode  \
-    -f .svelte-kit \
-	-f .angular  \
-	-f .mvn  \
-	-f zig-out  \
-	-f gradle  \
-	-f .cache  \
-	-f asset  \
-	-f resource \
-	-f mythsim \
-	-f cmake \
-	-f test \
-	-f conf \
-	-f logs \
-	-f .git \
-	-f .next \
-	-f .astro \
-	-f .settings \
-	-f .swc \
-	-f .idea \
-	-f node_modules \
-	-f bin \
-	-f e2e \
-	-f build \
-	-f target \
-    -f dist)
+dirs=$(stribog-options $2)
 
 echo "$dirs" | fzf --reverse --preview 'echo {}' --preview-window=right:30%:wrap --preview="ls {}"
