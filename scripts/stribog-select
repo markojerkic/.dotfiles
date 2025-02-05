@@ -7,6 +7,6 @@ else
     target=~/dev
 fi
 
-dirs=$(stribog-options $2)
+dirs=$(stribog-options $target)
 
 echo "$dirs" | fzf --reverse --preview 'echo {}' --preview-window=right:30%:wrap --preview="ls {}"
