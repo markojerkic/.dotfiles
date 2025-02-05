@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 
 # Flag -t "path" is for target directory
-if [[ $# -eq 2 ]]; then
-    target=$2
+if [[ $# -eq 1 ]]; then
+    target=$1
 else
     target=~/dev
 fi
+
 stribog -i \
     -m 4 \
     -r $target \
