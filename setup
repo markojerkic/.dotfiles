@@ -6,6 +6,7 @@ rm -rf ~/.config/i3
 rm -rf ~/.config/i3status
 rm -rf ~/.config/compton
 rm -rf ~/.config/ghostty
+rm -rf ~/.config/zed
 
 rm ~/.zshrc
 rm ~/.gitconfig
@@ -22,3 +23,4 @@ ln -s ~/dev/.dotfiles/.config/i3 ~/.config/i3
 ln -s ~/dev/.dotfiles/.config/i3status ~/.config/i3status
 ln -s ~/dev/.dotfiles/.config/compton ~/.config/compton
 ln -s ~/dev/.dotfiles/.config/ghostty ~/.config/ghostty
+ln -s ~/dev/.dotfiles/.config/zed ~/.config/zed
