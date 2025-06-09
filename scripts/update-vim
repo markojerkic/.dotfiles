@@ -1,0 +1,233 @@
+#!/bin/bash
+
+set -e  # Exit on any error
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to print colored output
+print_status() {
+    echo -e "${BLUE}[INFO]${NC} $1" >&2
+}
+
+print_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1" >&2
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1" >&2
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1" >&2
+}
+
+# Check if required tools are available
+check_dependencies() {
+    local deps=("curl" "jq" "chmod")
+    for dep in "${deps[@]}"; do
+        if ! command -v "$dep" &> /dev/null; then
+            print_error "$dep is required but not installed."
+            exit 1
+        fi
+    done
+}
+
+# Find the current vim location
+find_vim_location() {
+    local vim_path
+    vim_path=$(which vim 2>/dev/null || echo "")
+
+    if [[ -n "$vim_path" ]]; then
+        echo "$vim_path"
+    else
+        # Default locations to try
+        for path in "/usr/local/bin/vim" "/usr/bin/vim" "/bin/vim"; do
+            if [[ -e "$path" ]]; then
+                echo "$path"
+                return
+            fi
+        done
+        # If no vim found, default to /usr/local/bin/vim
+        echo "/usr/local/bin/vim"
+    fi
+}
+
+# Get the latest stable release and AppImage download URL from GitHub
+get_latest_release_info() {
+    print_status "Fetching latest stable release from GitHub..."
+
+    local api_url="https://api.github.com/repos/neovim/neovim/releases"
+    local release_info
+
+    # Get releases and filter for stable versions, then extract tag and AppImage URL
+    release_info=$(curl -s "$api_url" | jq -r '
+        map(select(.prerelease == false and .draft == false)) |
+        .[0] |
+        {
+            tag: .tag_name,
+            appimage_url: (.assets[] | select(.name | test("nvim.*linux.*x86_64.*appimage$"; "i")) | .browser_download_url)
+        } |
+        "\(.tag)|\(.appimage_url)"
+    ')
+
+    if [[ -z "$release_info" || "$release_info" == "null|null" ]]; then
+        print_error "Failed to fetch latest release info or AppImage not found"
+        exit 1
+    fi
+
+    local tag=$(echo "$release_info" | cut -d'|' -f1)
+    local url=$(echo "$release_info" | cut -d'|' -f2)
+
+    print_success "Found latest stable release: $tag"
+    print_status "AppImage URL: $url"
+
+    echo "$release_info"
+}
+
+# Download the AppImage
+download_appimage() {
+    local download_url="$1"
+    local tag="$2"
+    local filename="nvim-$tag.appimage"
+    local download_path="/tmp/$filename"
+
+    print_status "Downloading Neovim AppImage from: $download_url"
+
+    if curl -L -o "$download_path" "$download_url"; then
+        print_success "Downloaded: $download_path"
+        echo "$download_path"
+    else
+        print_error "Failed to download AppImage"
+        exit 1
+    fi
+}
+
+# Make AppImage executable and move to final location
+install_appimage() {
+    local appimage_path="$1"
+    local install_dir="/usr/local/bin"
+    local final_path="$install_dir/nvim"
+
+    print_status "Installing AppImage to $final_path"
+
+    # Make executable
+    chmod +x "$appimage_path"
+
+    # Create install directory if it doesn't exist
+    if [[ ! -d "$install_dir" ]]; then
+        print_status "Creating directory: $install_dir"
+        mkdir -p "$install_dir"
+    fi
+
+    # Move to final location
+    if mv "$appimage_path" "$final_path"; then
+        print_success "Installed Neovim to: $final_path"
+        echo "$final_path"
+    else
+        print_error "Failed to install AppImage"
+        exit 1
+    fi
+}
+
+# Create symlink to vim location
+create_symlink() {
+    local nvim_path="$1"
+    local vim_path="$2"
+
+    print_status "Creating symlink: $vim_path -> $nvim_path"
+
+    # Backup existing vim if it exists and is not a symlink
+    if [[ -e "$vim_path" && ! -L "$vim_path" ]]; then
+        local backup_path="${vim_path}.backup.$(date +%Y%m%d_%H%M%S)"
+        print_warning "Backing up existing vim to: $backup_path"
+        mv "$vim_path" "$backup_path"
+    elif [[ -L "$vim_path" ]]; then
+        print_warning "Removing existing symlink: $vim_path"
+        rm "$vim_path"
+    fi
+
+    # Create the symlink
+    if ln -sf "$nvim_path" "$vim_path"; then
+        print_success "Created symlink: $vim_path -> $nvim_path"
+    else
+        print_error "Failed to create symlink"
+        exit 1
+    fi
+}
+
+# Verify installation
+verify_installation() {
+    local vim_path="$1"
+
+    print_status "Verifying installation..."
+
+    if [[ -L "$vim_path" ]]; then
+        local target=$(readlink "$vim_path")
+        print_success "Symlink verified: $vim_path -> $target"
+
+        # Test if nvim runs
+        if "$vim_path" --version | head -1; then
+            print_success "Neovim is working correctly!"
+        else
+            print_error "Neovim installation verification failed"
+            exit 1
+        fi
+    else
+        print_error "Symlink was not created properly"
+        exit 1
+    fi
+}
+
+# Main function
+main() {
+    print_status "Starting Neovim installation script..."
+
+    # Check if running with sufficient privileges for system directories
+    if [[ $EUID -eq 0 ]]; then
+        print_warning "Running as root. This is not recommended."
+    fi
+
+    # Check dependencies
+    check_dependencies
+
+    # Get latest stable release info
+    local release_info
+    release_info=$(get_latest_release_info)
+
+    local tag=$(echo "$release_info" | cut -d'|' -f1)
+    local appimage_url=$(echo "$release_info" | cut -d'|' -f2)
+
+    # Find vim location
+    local vim_location
+    vim_location=$(find_vim_location)
+    print_status "Target vim location: $vim_location"
+
+    # Download AppImage
+    local appimage_path
+    appimage_path=$(download_appimage "$appimage_url" "$tag")
+
+    # Install AppImage
+    local nvim_path
+    nvim_path=$(install_appimage "$appimage_path")
+
+    # Create symlink
+    create_symlink "$nvim_path" "$vim_location"
+
+    # Verify installation
+    verify_installation "$vim_location"
+
+    print_success "Installation completed successfully!"
+    print_status "You can now use 'vim' command to run Neovim $tag"
+    print_status "Direct nvim command is also available at: $nvim_path"
+}
+
+# Handle script interruption
+trap 'print_error "Script interrupted"; exit 1' INT TERM
+
+# Run main function
+main "$@"
