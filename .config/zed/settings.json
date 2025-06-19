@@ -9,8 +9,8 @@
 {
   "assistant": {
     "default_model": {
-      "provider": "zed.dev",
-      "model": "claude-3-5-sonnet-latest"
+      "provider": "anthropic",
+      "model": "claude-3-5-haiku-latest"
     },
     "version": "2"
   },
@@ -20,7 +20,7 @@
   "theme": {
     "mode": "system",
     "light": "One Light",
-    "dark": "Rosé Pine Moon"
+    "dark": "Rosé Pine"
   },
 
   "project_panel": {
@@ -33,7 +33,28 @@
     "show": false
   },
 
+  "languages": {
+    "Templ": {
+      "format_on_save": "on",
+      "language_servers": [
+        "tailwindcss-language-server",
+        "vscode-html-language-server"
+      ],
+      "inlay_hints": {
+        "enabled": true
+      }
+    }
+  },
+
   "lsp": {
+    "tailwindcss-language-server": {
+      "settings": {
+        "includeLanguages": {
+          "templ": "html",
+          "Templ": "html"
+        }
+      }
+    },
     "jdtls": {
       "initialization_options": {
         "settings": {

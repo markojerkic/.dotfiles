@@ -13,6 +13,7 @@ stribog -i \
 	-r ~/Slike/WP \
 	-r ~/Preuzimanja \
 	-f .gradle  \
+	-f .zig-cache  \
 	-f .vscode  \
 	-f .server  \
 	-f .nx  \

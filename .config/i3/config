@@ -205,7 +205,7 @@ default_border pixel 0
 default_floating_border pixel 0
 for_window [class="^.*"] border pixel 0
 
-set $rosewater #f5e0
+set $rosewater #f5e0dc
 set $flamingo  #f2cdcd
 set $pink      #f5c2e7
 set $mauve     #cba6f7
