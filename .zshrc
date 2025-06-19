@@ -74,7 +74,6 @@ plugins=(
         git
         zsh-autosuggestions
         zsh-shift-select
-        asdf
 )
 
 
@@ -144,3 +143,6 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+# opencode
+export PATH=/home/marko/.opencode/bin:$PATH

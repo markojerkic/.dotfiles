@@ -10,7 +10,7 @@ check_error() {
 
 # Function to find the latest version of Go
 get_latest_go_version() {
-  LATEST_VERSION=$(curl -s https://golang.org/VERSION?m=text)
+  LATEST_VERSION=$(curl -s https://go.dev/VERSION?m=text)
   check_error
   echo $LATEST_VERSION
 }
@@ -31,11 +31,13 @@ install_go() {
   VERSION=$1
   PLATFORM=$2
   ARCH=$3
+  DOWNLOAD_URL="https://go.dev/dl/${VERSION}.${PLATFORM}-${ARCH}.tar.gz"
 
-  DOWNLOAD_URL="https://dl.google.com/go/${VERSION}.${PLATFORM}-${ARCH}.tar.gz"
-  wget $DOWNLOAD_URL -O /tmp/go.tar.gz
+  echo "Downloading Go from $DOWNLOAD_URL"
+  wget -q --show-progress $DOWNLOAD_URL -O /tmp/go.tar.gz
   check_error
 
+  echo "Extracting Go to /usr/local"
   sudo tar -C /usr/local -xzf /tmp/go.tar.gz
   check_error
 
@@ -49,11 +51,27 @@ install_go() {
 update_env_variables() {
   echo "Updating environment variables..."
 
-  if ! grep -q "/usr/local/go/bin" ~/.profile; then
-    echo "export PATH=\$PATH:/usr/local/go/bin" >> ~/.profile
+  # Check for both .profile and .bashrc
+  for profile_file in ~/.profile ~/.bashrc; do
+    if [ -f "$profile_file" ] && ! grep -q "GOPATH" "$profile_file"; then
+      echo "Adding Go environment variables to $profile_file"
+      {
+        echo "# Go environment variables"
+        echo "export GOPATH=\$HOME/go"
+        echo "export PATH=\$PATH:/usr/local/go/bin:\$GOPATH/bin"
+      } >> "$profile_file"
+    fi
+  done
+
+  # Create Go workspace directory if it doesn't exist
+  if [ ! -d "$HOME/go" ]; then
+    mkdir -p "$HOME/go/bin" "$HOME/go/pkg" "$HOME/go/src"
+    echo "Created Go workspace directories in $HOME/go"
   fi
 
-  source ~/.profile
+  # Update current shell environment
+  export GOPATH=$HOME/go
+  export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 
   echo "Environment variables updated."
 }
@@ -78,20 +96,33 @@ fi
 # Determine platform and architecture
 PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 ARCH=$(uname -m)
+
+# More comprehensive architecture detection
 if [ "$ARCH" == "x86_64" ]; then
   ARCH="amd64"
-elif [ "$ARCH" == "aarch64" ]; then
+elif [ "$ARCH" == "aarch64" ] || [ "$ARCH" == "arm64" ]; then
   ARCH="arm64"
+elif [[ "$ARCH" =~ ^armv.* ]]; then
+  ARCH="armv6l"
+elif [ "$ARCH" == "i386" ] || [ "$ARCH" == "i686" ]; then
+  ARCH="386"
+elif [ "$ARCH" == "ppc64le" ] || [ "$ARCH" == "s390x" ] || [ "$ARCH" == "mips" ] || [ "$ARCH" == "mipsle" ]; then
+  # Keep these architectures as is
+  :
 else
+  echo "Warning: Unsupported architecture $ARCH, defaulting to 386"
   ARCH="386"
 fi
 
 echo "Platform: $PLATFORM"
 echo "Architecture: $ARCH"
 
-# Remove any existing Go installation
-sudo rm -rf /usr/local/go
-check_error
+# Backup existing Go installation if it exists
+if [ -d "/usr/local/go" ]; then
+  echo "Backing up existing Go installation..."
+  sudo mv /usr/local/go "/usr/local/go.backup.$(date +%Y%m%d%H%M%S)"
+  check_error
+fi
 
 # Install the latest Go version
 install_go $LATEST_VERSION $PLATFORM $ARCH
@@ -99,5 +130,6 @@ install_go $LATEST_VERSION $PLATFORM $ARCH
 # Update environment variables
 update_env_variables
 
-echo "Go upgrade process completed. Please restart your terminal or run '
-,
+echo "Go upgrade process completed successfully!"
+echo "You can verify the installation by running: go version"
+echo "You may need to restart your terminal or run 'source ~/.profile' for environment changes to take effect."
