@@ -147,3 +147,6 @@ esac
 
 # opencode
 export PATH=/home/marko/.opencode/bin:$PATH
+
+# opencode
+export PATH=/root/.opencode/bin:$PATH
