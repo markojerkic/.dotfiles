@@ -150,3 +150,4 @@ export PATH=/home/marko/.opencode/bin:$PATH
 
 # opencode
 export PATH=/root/.opencode/bin:$PATH
+export PATH="/root/dev/.dotfiles/scripts:$PATH"

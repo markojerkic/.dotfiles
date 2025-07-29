@@ -1,26 +1,64 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-# Delete the existing symbolic links
-rm -rf ~/.config/nvim
-rm -rf ~/.config/i3
-rm -rf ~/.config/i3status
-rm -rf ~/.config/compton
-rm -rf ~/.config/ghostty
-rm -rf ~/.config/zed
+set -e
 
-rm ~/.zshrc
-rm ~/.gitconfig
-rm ~/.tmux.conf
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# make a symbolic link to the dotfiles
-ln -s ~/dev/.dotfiles/.tmux.conf ~/.tmux.conf
-ln -s ~/dev/.dotfiles/.gitconfig ~/.gitconfig
-ln -s ~/dev/.dotfiles/.zshrc ~/.zshrc
+echo "Setting up dotfiles from $DOTFILES_DIR..."
 
-ln -s ~/dev/.dotfiles/.config/nvim-config ~/.config/nvim
+# Ensure ~/.config exists
+mkdir -p ~/.config
 
-ln -s ~/dev/.dotfiles/.config/i3 ~/.config/i3
-ln -s ~/dev/.dotfiles/.config/i3status ~/.config/i3status
-ln -s ~/dev/.dotfiles/.config/compton ~/.config/compton
-ln -s ~/dev/.dotfiles/.config/ghostty ~/.config/ghostty
-ln -s ~/dev/.dotfiles/.config/zed ~/.config/zed
+# Function to safely create symlinks
+create_symlink() {
+    local source="$1"
+    local target="$2"
+
+    if [ -L "$target" ]; then
+        echo "Removing existing symlink: $target"
+        rm "$target"
+    elif [ -e "$target" ]; then
+        echo "Backing up existing file: $target -> $target.backup"
+        mv "$target" "$target.backup"
+    fi
+
+    echo "Creating symlink: $target -> $source"
+    ln -sf "$source" "$target"
+}
+
+# Home directory configs
+create_symlink "$DOTFILES_DIR/.tmux.conf" ~/.tmux.conf
+create_symlink "$DOTFILES_DIR/.gitconfig" ~/.gitconfig
+create_symlink "$DOTFILES_DIR/.zshrc" ~/.zshrc
+
+# .config directory configs
+create_symlink "$DOTFILES_DIR/.config/nvim-config" ~/.config/nvim
+create_symlink "$DOTFILES_DIR/.config/fish" ~/.config/fish
+create_symlink "$DOTFILES_DIR/.config/i3" ~/.config/i3
+create_symlink "$DOTFILES_DIR/.config/i3status" ~/.config/i3status
+create_symlink "$DOTFILES_DIR/.config/compton" ~/.config/compton
+create_symlink "$DOTFILES_DIR/.config/ghostty" ~/.config/ghostty
+create_symlink "$DOTFILES_DIR/.config/zed" ~/.config/zed
+create_symlink "$DOTFILES_DIR/.config/biome" ~/.config/biome
+
+# Make scripts executable and add to PATH if needed
+if [ -d "$DOTFILES_DIR/scripts" ]; then
+    echo "Making scripts executable..."
+    chmod +x "$DOTFILES_DIR/scripts"/*
+
+    # Add scripts to PATH in shell configs if not already there
+    SCRIPTS_PATH="export PATH=\"$DOTFILES_DIR/scripts:\$PATH\""
+
+    if [ -f ~/.zshrc ] && ! grep -q "$DOTFILES_DIR/scripts" ~/.zshrc; then
+        echo "Adding scripts to PATH in .zshrc"
+        echo "$SCRIPTS_PATH" >> ~/.zshrc
+    fi
+
+    if [ -f ~/.config/fish/config.fish ] && ! grep -q "$DOTFILES_DIR/scripts" ~/.config/fish/config.fish; then
+        echo "Adding scripts to PATH in fish config"
+        echo "set -gx PATH $DOTFILES_DIR/scripts \$PATH" >> ~/.config/fish/config.fish
+    fi
+fi
+
+echo "✅ Dotfiles setup complete!"
+echo "Note: Restart your shell or source your config files to apply changes."
