@@ -21,12 +21,74 @@ create_symlink() {
     ln -sf "$source" "$target"
 }
 
+# Function to check if package is installed
+is_package_installed() {
+    pacman -Q "$1" &> /dev/null
+}
+
+install_deps() {
+    # Check if pacman is available
+    if ! command -v pacman &> /dev/null; then
+        echo "❌ Pacman not found. This script is for Arch Linux systems."
+        exit 1
+    fi
+
+    echo "📦 Installing/updating system packages..."
+
+    # System update first
+    echo "🔄 Updating system..."
+    sudo pacman -Syu --noconfirm
+
+    # List of packages to install
+    local packages=(
+        "wtype"          # Wayland text input
+        "solaar"         # Logitech device manager
+        "kanshi"         # Display configuration
+        "go"             # Go programming language
+        "tmux"           # Terminal multiplexer
+        "fish"           # Fish shell
+        "ghostty"        # Terminal emulator
+        "chafa"          # Image viewer in terminal
+        "git"            # Version control
+        "curl"           # Download tool
+        "unzip"          # Archive extraction
+        "base-devel"     # Build tools
+    )
+
+    local to_install=()
+
+    # Check which packages need to be installed
+    for package in "${packages[@]}"; do
+        if ! is_package_installed "$package"; then
+            to_install+=("$package")
+            echo "📋 Will install: $package"
+        else
+            echo "✅ Already installed: $package"
+        fi
+    done
+
+    # Install missing packages
+    if [ ${#to_install[@]} -gt 0 ]; then
+        echo "🚀 Installing packages: ${to_install[*]}"
+        sudo pacman -S --noconfirm "${to_install[@]}"
+        echo "✅ Package installation complete!"
+    else
+        echo "✅ All required packages are already installed!"
+    fi
+
+}
+
+# Install dependencies first
+install_deps
+
 # Home directory configs
+echo "🔗 Creating symlinks for home directory configs..."
 create_symlink "$DOTFILES_DIR/.tmux.conf" ~/.tmux.conf
 create_symlink "$DOTFILES_DIR/.gitconfig" ~/.gitconfig
 create_symlink "$DOTFILES_DIR/.zshrc" ~/.zshrc
 
 # .config directory configs
+echo "🔗 Creating symlinks for .config directory configs..."
 create_symlink "$DOTFILES_DIR/.config/nvim-config" ~/.config/nvim
 create_symlink "$DOTFILES_DIR/.config/fish" ~/.config/fish
 create_symlink "$DOTFILES_DIR/.config/i3" ~/.config/i3
@@ -42,57 +104,89 @@ create_symlink "$DOTFILES_DIR/.config/kanshi" ~/.config/kanshi
 
 # Make scripts executable and add to PATH if needed
 if [ -d "$DOTFILES_DIR/scripts" ]; then
-    echo "Making scripts executable..."
+    echo "🔧 Making scripts executable..."
     chmod +x "$DOTFILES_DIR/scripts"/*
+
     # Add scripts to PATH in shell configs if not already there
     SCRIPTS_PATH="export PATH=\"$DOTFILES_DIR/scripts:\$PATH\""
     if [ -f ~/.zshrc ] && ! grep -q "$DOTFILES_DIR/scripts" ~/.zshrc; then
-        echo "Adding scripts to PATH in .zshrc"
+        echo "📝 Adding scripts to PATH in .zshrc"
         echo "$SCRIPTS_PATH" >> ~/.zshrc
     fi
     if [ -f ~/.config/fish/config.fish ] && ! grep -q "$DOTFILES_DIR/scripts" ~/.config/fish/config.fish; then
-        echo "Adding scripts to PATH in fish config"
+        echo "📝 Adding scripts to PATH in fish config"
         echo "set -gx PATH $DOTFILES_DIR/scripts \$PATH" >> ~/.config/fish/config.fish
     fi
 fi
 
-# Install stribog
-echo "Installing stribog..."
-STRIBOG_VERSION="0.6.0"
-STRIBOG_URL="https://github.com/markojerkic/stribog/releases/download/v${STRIBOG_VERSION}/stribog_v${STRIBOG_VERSION}_x86_64-unknown-linux-musl.zip"
-TEMP_DIR=$(mktemp -d)
+# Install stribog if not already present
+if ! command -v stribog &> /dev/null; then
+    echo "📦 Installing stribog..."
+    STRIBOG_VERSION="0.6.0"
+    STRIBOG_URL="https://github.com/markojerkic/stribog/releases/download/v${STRIBOG_VERSION}/stribog_v${STRIBOG_VERSION}_x86_64-unknown-linux-musl.zip"
+    TEMP_DIR=$(mktemp -d)
 
-echo "Downloading stribog v${STRIBOG_VERSION}..."
-curl -L "$STRIBOG_URL" -o "$TEMP_DIR/stribog.zip"
+    echo "⬇️  Downloading stribog v${STRIBOG_VERSION}..."
+    curl -L "$STRIBOG_URL" -o "$TEMP_DIR/stribog.zip"
 
-echo "Extracting stribog..."
-unzip -q "$TEMP_DIR/stribog.zip" -d "$TEMP_DIR"
+    echo "📂 Extracting stribog..."
+    unzip -q "$TEMP_DIR/stribog.zip" -d "$TEMP_DIR"
 
-# Create ~/.local/bin if it doesn't exist and install stribog there
-mkdir -p ~/.local/bin
-echo "Installing stribog to ~/.local/bin..."
-mv "$TEMP_DIR/stribog" ~/.local/bin/
-chmod +x ~/.local/bin/stribog
+    # Create ~/.local/bin if it doesn't exist and install stribog there
+    mkdir -p ~/.local/bin
+    echo "📦 Installing stribog to ~/.local/bin..."
+    mv "$TEMP_DIR/stribog" ~/.local/bin/
+    chmod +x ~/.local/bin/stribog
 
-# Clean up
-rm -rf "$TEMP_DIR"
+    # Clean up
+    rm -rf "$TEMP_DIR"
+    echo "✅ Stribog v${STRIBOG_VERSION} installed successfully!"
+else
+    echo "✅ Stribog is already installed!"
+fi
 
 # Add ~/.local/bin to PATH if not already there
 LOCAL_BIN_PATH="export PATH=\"\$HOME/.local/bin:\$PATH\""
 if [ -f ~/.zshrc ] && ! grep -q "\$HOME/.local/bin" ~/.zshrc; then
-    echo "Adding ~/.local/bin to PATH in .zshrc"
+    echo "📝 Adding ~/.local/bin to PATH in .zshrc"
     echo "$LOCAL_BIN_PATH" >> ~/.zshrc
 fi
 if [ -f ~/.config/fish/config.fish ] && ! grep -q "\$HOME/.local/bin" ~/.config/fish/config.fish; then
-    echo "Adding ~/.local/bin to PATH in fish config"
+    echo "📝 Adding ~/.local/bin to PATH in fish config"
     echo "set -gx PATH \$HOME/.local/bin \$PATH" >> ~/.config/fish/config.fish
 fi
 
-# Install tpm
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-echo "✅ TPMj setup complete!"j
+# Install tmux plugin manager if not already present
+if [ ! -d ~/.tmux/plugins/tpm ]; then
+    echo "📦 Installing tmux plugin manager..."
+    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+    echo "✅ TPM setup complete!"
+else
+    echo "✅ TPM is already installed!"
+fi
 
-echo "✅ Dotfiles setup complete!"
-echo "✅ Stribog v${STRIBOG_VERSION} installed successfully!"
-echo "Note: Restart your shell or source your config files to apply changes."
-echo "You can now use 'stribog' command from anywhere."
+# Set up user groups for input devices (for Solaar/mouse functionality)
+if ! groups | grep -q input; then
+    echo "🔧 Adding user to input group for device access..."
+    sudo usermod -a -G input "$USER"
+    echo "⚠️  You'll need to log out and back in for input group changes to take effect!"
+fi
+
+echo ""
+echo "🎉 Dotfiles setup complete!"
+echo ""
+echo "📋 Next steps:"
+echo "   1. Restart your shell or run: source ~/.zshrc (or ~/.config/fish/config.fish)"
+echo "   2. If you were added to the input group, log out and back in"
+echo "   3. Open tmux and press Ctrl+B then I to install tmux plugins"
+echo "   4. Configure your Hyprland mouse bindings if needed"
+echo ""
+echo "🔧 Tools installed:"
+echo "   • Solaar (Logitech device manager)"
+echo "   • wtype (Wayland key injection)"
+echo "   • kanshi (Display configuration)"
+echo "   • ghostty (Terminal emulator)"
+echo "   • tmux + fish (Terminal tools)"
+echo "   • stribog (Custom tool)"
+echo ""
+echo "✅ All done! Enjoy your configured system!"
