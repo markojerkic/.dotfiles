@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 if [ "$#" -eq 1 ]; then
     selected="$1"
 else
@@ -8,24 +7,20 @@ else
         available_width=$(($(tput cols) * 60 / 100))
         available_height=$(tput lines)
         width_x_height="${available_width}x${available_height}"
-
         selected=$(find ~/Slike/WP -maxdepth 1 -type f -name "*.jpg" | \
             fzf --preview "chafa {} --size $width_x_height --symbols vhalf --stretch" --preview-window=right:70%:wrap)
     else
         read selected
     fi
 fi
-
 # Check if the selected file exists
 if [ ! -f "$selected" ]; then
     echo "Error: File not found: $selected"
     exit 1
 fi
-
 if [ "$#" -ne 1 ]; then
     tmux select-window -n
 fi
-
 if [ -d /mnt/c/ ]; then
     terminal_dir=$(find "$(wslpath "$(wslvar USERPROFILE)")/AppData/Local/Packages/" -maxdepth 1 -type d -name "Microsoft.WindowsTerminal*")
     settings_file="$terminal_dir/LocalState/settings.json"
@@ -34,15 +29,77 @@ if [ -d /mnt/c/ ]; then
         | jq --arg new_image "$(wslpath -w "$selected" | sed 's/\\/\\\\/g')" \
             '.profiles.list[].backgroundImage = $new_image' > /tmp/wterminal.json
     mv /tmp/wterminal.json "$settings_file"
+elif [ -d "$HOME/.config/omarchy" ] && [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]; then
+    echo "DEBUG: Detected omarchy + Hyprland setup"
+    # omarchy setup - link the selected wallpaper and use swaybg
+    CURRENT_BACKGROUND_LINK="$HOME/.config/omarchy/current/background"
+
+    # Set new background symlink to our selected image
+    ln -nsf "$selected" "$CURRENT_BACKGROUND_LINK"
+    echo "DEBUG: Created symlink to $selected"
+
+    # Compute the average color for background
+    echo "DEBUG: Computing average color..."
+    if command -v convert >/dev/null 2>&1; then
+        average_color=$(convert "$selected" -scale 1x1\! -format '%[pixel:u]' info:- \
+            | sed -e 's/srgb(\([0-9.]*\)%,\([0-9.]*\)%,\([0-9.]*\)%)/\1 \2 \3/' \
+            | awk '{printf "#%02x%02x%02x\n", $1*2.55, $2*2.55, $3*2.55}')
+        echo "DEBUG: Average color: $average_color"
+    else
+        echo "ERROR: ImageMagick 'convert' command not found!"
+        average_color="#000000"
+    fi
+
+    # Relaunch swaybg with the new wallpaper and background color
+    pkill -x swaybg
+    setsid uwsm app -- swaybg -i "$CURRENT_BACKGROUND_LINK" -m fit -c "$average_color" >/dev/null 2>&1 &
+    echo "DEBUG: Launched swaybg with color $average_color"
+
+    echo "$selected" > ~/.bg-image
+
+    # Create lockscreen image (omarchy might have its own screen resolution detection)
+    echo "DEBUG: Creating lockscreen image..."
+    if command -v hyprctl >/dev/null 2>&1; then
+        # Fix the jq parsing - get width and height separately then combine
+        width=$(hyprctl monitors -j | jq -r '.[0].width')
+        height=$(hyprctl monitors -j | jq -r '.[0].height')
+        screen_size="${width}x${height}"
+        echo "DEBUG: Screen size from hyprctl: $screen_size (width: $width, height: $height)"
+    else
+        # Fallback to a common resolution if hyprctl is not available
+        screen_size="1920x1080"
+        echo "DEBUG: Using fallback screen size: $screen_size"
+    fi
+
+    # Create lockscreen with absolute path and verify creation
+    lockscreen_path="$HOME/lockscreen.png"
+    echo "DEBUG: Converting image for lockscreen with size: $screen_size"
+    if command -v magick >/dev/null 2>&1; then
+        # Create lockscreen in "fit" mode - image fits entirely with average color background
+        magick "$selected" -resize "${screen_size}>" -gravity center -background "$average_color" -extent "$screen_size" -flatten "$lockscreen_path"
+        echo "DEBUG: Magick command executed (fit mode)"
+    elif command -v convert >/dev/null 2>&1; then
+        # Create lockscreen in "fit" mode - image fits entirely with average color background
+        convert "$selected" -resize "${screen_size}>" -gravity center -background "$average_color" -extent "$screen_size" -flatten "$lockscreen_path"
+        echo "DEBUG: Convert command executed (fit mode)"
+    else
+        echo "ERROR: Cannot create lockscreen - ImageMagick not installed"
+    fi
+
+    # Verify the lockscreen was created and notify
+    if [ -f "$lockscreen_path" ]; then
+        echo "SUCCESS: Lockscreen image created: $lockscreen_path"
+        ls -la "$lockscreen_path"
+    else
+        echo "ERROR: Failed to create lockscreen image at $lockscreen_path"
+    fi
 else
     # Compute the average color of the image as a hex value
     average_color=$(convert "$selected" -scale 1x1\! -format '%[pixel:u]' info:- \
         | sed -e 's/srgb(\([0-9.]*\)%,\([0-9.]*\)%,\([0-9.]*\)%)/\1 \2 \3/' \
         | awk '{printf "#%02x%02x%02x\n", $1*2.55, $2*2.55, $3*2.55}')
-
     feh --bg-max --image-bg "$average_color" "$selected"
     echo "$selected" > ~/.bg-image
-
     screen_size=$(xdpyinfo | awk '/dimensions/ {print $2}')
     convert "$selected" -resize "$screen_size" -gravity center -extent "$screen_size" -background "$average_color" -flatten ~/lockscreen.png
 fi
