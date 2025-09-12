@@ -1,0 +1,11 @@
+# Profile when HDMI is connected - only use HDMI
+profile hdmi {
+    output "HDMI-A-1" enable scale 1
+    output "eDP-1" disable
+}
+
+# Profile when only laptop screen - use laptop
+profile laptop {
+    output "eDP-1" enable scale 2
+    output "HDMI-A-1" disable
+}

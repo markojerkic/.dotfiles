@@ -38,6 +38,7 @@ create_symlink "$DOTFILES_DIR/.config/waybar" ~/.config/waybar
 create_symlink "$DOTFILES_DIR/.config/ghostty" ~/.config/ghostty
 create_symlink "$DOTFILES_DIR/.config/zed" ~/.config/zed
 create_symlink "$DOTFILES_DIR/.config/biome" ~/.config/biome
+create_symlink "$DOTFILES_DIR/.config/kanshi" ~/.config/kanshi
 
 # Make scripts executable and add to PATH if needed
 if [ -d "$DOTFILES_DIR/scripts" ]; then
