@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
-
 set -e
-
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
 echo "Setting up dotfiles from $DOTFILES_DIR..."
 
 # Ensure ~/.config exists
@@ -13,7 +10,6 @@ mkdir -p ~/.config
 create_symlink() {
     local source="$1"
     local target="$2"
-
     if [ -L "$target" ]; then
         echo "Removing existing symlink: $target"
         rm "$target"
@@ -21,7 +17,6 @@ create_symlink() {
         echo "Backing up existing file: $target -> $target.backup"
         mv "$target" "$target.backup"
     fi
-
     echo "Creating symlink: $target -> $source"
     ln -sf "$source" "$target"
 }
@@ -37,6 +32,9 @@ create_symlink "$DOTFILES_DIR/.config/fish" ~/.config/fish
 create_symlink "$DOTFILES_DIR/.config/i3" ~/.config/i3
 create_symlink "$DOTFILES_DIR/.config/i3status" ~/.config/i3status
 create_symlink "$DOTFILES_DIR/.config/compton" ~/.config/compton
+create_symlink "$DOTFILES_DIR/.config/hypr" ~/.config/hypr
+create_symlink "$DOTFILES_DIR/.config/walker" ~/.config/walker
+create_symlink "$DOTFILES_DIR/.config/waybar" ~/.config/waybar
 create_symlink "$DOTFILES_DIR/.config/ghostty" ~/.config/ghostty
 create_symlink "$DOTFILES_DIR/.config/zed" ~/.config/zed
 create_symlink "$DOTFILES_DIR/.config/biome" ~/.config/biome
@@ -45,20 +43,55 @@ create_symlink "$DOTFILES_DIR/.config/biome" ~/.config/biome
 if [ -d "$DOTFILES_DIR/scripts" ]; then
     echo "Making scripts executable..."
     chmod +x "$DOTFILES_DIR/scripts"/*
-
     # Add scripts to PATH in shell configs if not already there
     SCRIPTS_PATH="export PATH=\"$DOTFILES_DIR/scripts:\$PATH\""
-
     if [ -f ~/.zshrc ] && ! grep -q "$DOTFILES_DIR/scripts" ~/.zshrc; then
         echo "Adding scripts to PATH in .zshrc"
         echo "$SCRIPTS_PATH" >> ~/.zshrc
     fi
-
     if [ -f ~/.config/fish/config.fish ] && ! grep -q "$DOTFILES_DIR/scripts" ~/.config/fish/config.fish; then
         echo "Adding scripts to PATH in fish config"
         echo "set -gx PATH $DOTFILES_DIR/scripts \$PATH" >> ~/.config/fish/config.fish
     fi
 fi
 
+# Install stribog
+echo "Installing stribog..."
+STRIBOG_VERSION="0.6.0"
+STRIBOG_URL="https://github.com/markojerkic/stribog/releases/download/v${STRIBOG_VERSION}/stribog_v${STRIBOG_VERSION}_x86_64-unknown-linux-musl.zip"
+TEMP_DIR=$(mktemp -d)
+
+echo "Downloading stribog v${STRIBOG_VERSION}..."
+curl -L "$STRIBOG_URL" -o "$TEMP_DIR/stribog.zip"
+
+echo "Extracting stribog..."
+unzip -q "$TEMP_DIR/stribog.zip" -d "$TEMP_DIR"
+
+# Create ~/.local/bin if it doesn't exist and install stribog there
+mkdir -p ~/.local/bin
+echo "Installing stribog to ~/.local/bin..."
+mv "$TEMP_DIR/stribog" ~/.local/bin/
+chmod +x ~/.local/bin/stribog
+
+# Clean up
+rm -rf "$TEMP_DIR"
+
+# Add ~/.local/bin to PATH if not already there
+LOCAL_BIN_PATH="export PATH=\"\$HOME/.local/bin:\$PATH\""
+if [ -f ~/.zshrc ] && ! grep -q "\$HOME/.local/bin" ~/.zshrc; then
+    echo "Adding ~/.local/bin to PATH in .zshrc"
+    echo "$LOCAL_BIN_PATH" >> ~/.zshrc
+fi
+if [ -f ~/.config/fish/config.fish ] && ! grep -q "\$HOME/.local/bin" ~/.config/fish/config.fish; then
+    echo "Adding ~/.local/bin to PATH in fish config"
+    echo "set -gx PATH \$HOME/.local/bin \$PATH" >> ~/.config/fish/config.fish
+fi
+
+# Install tpm
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+echo "✅ TPMj setup complete!"j
+
 echo "✅ Dotfiles setup complete!"
+echo "✅ Stribog v${STRIBOG_VERSION} installed successfully!"
 echo "Note: Restart your shell or source your config files to apply changes."
+echo "You can now use 'stribog' command from anywhere."

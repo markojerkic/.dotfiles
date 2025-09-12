@@ -34,8 +34,9 @@ set -gx PATH /root/.opencode/bin $PATH
 set -gx PATH /root/dev/.dotfiles/scripts $PATH
 
 # Initialize tools
-if command -v fnm >/dev/null
-    fnm env | source
+if [ -d "$FNM_PATH" ]
+  set PATH "$FNM_PATH" $PATH
+  fnm env | source
 end
 
 if test -f $HOME/.sdkman/bin/sdkman-init.sh
@@ -44,3 +45,6 @@ if test -f $HOME/.sdkman/bin/sdkman-init.sh
         set -gx JAVA_HOME $SDKMAN_DIR/candidates/java/current
     end
 end
+set -gx PATH /home/marko/dev/.dotfiles/scripts $PATH
+
+set -x N_PREFIX "$HOME/n"; contains "$N_PREFIX/bin" $PATH; or set -a PATH "$N_PREFIX/bin"  # Added by n-install (see http://git.io/n-install-repo).
