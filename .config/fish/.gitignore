@@ -1,0 +1,12 @@
+# Fish shell auto-generated files
+fish_variables
+
+# Fisher plugin auto-generated files
+completions/
+conf.d/
+themes/
+
+# Auto-generated plugin functions
+functions/fisher.fish
+functions/sdk.fish
+functions/__sdkman-noexport-init.sh
