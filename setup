@@ -29,8 +29,8 @@ is_package_installed() {
 install_deps() {
     # Check if pacman is available
     if ! command -v pacman &> /dev/null; then
-        echo "❌ Pacman not found. This script is for Arch Linux systems."
-        exit 1
+        echo "❌ Pacman not found. Skipping package installation."
+        return 0
     fi
 
     echo "📦 Installing/updating system packages..."
@@ -89,18 +89,13 @@ create_symlink "$DOTFILES_DIR/.zshrc" ~/.zshrc
 
 # .config directory configs
 echo "🔗 Creating symlinks for .config directory configs..."
-create_symlink "$DOTFILES_DIR/.config/nvim-config" ~/.config/nvim
-create_symlink "$DOTFILES_DIR/.config/fish" ~/.config/fish
-create_symlink "$DOTFILES_DIR/.config/i3" ~/.config/i3
-create_symlink "$DOTFILES_DIR/.config/i3status" ~/.config/i3status
-create_symlink "$DOTFILES_DIR/.config/compton" ~/.config/compton
-create_symlink "$DOTFILES_DIR/.config/hypr" ~/.config/hypr
-create_symlink "$DOTFILES_DIR/.config/walker" ~/.config/walker
-create_symlink "$DOTFILES_DIR/.config/waybar" ~/.config/waybar
-create_symlink "$DOTFILES_DIR/.config/ghostty" ~/.config/ghostty
-create_symlink "$DOTFILES_DIR/.config/zed" ~/.config/zed
-create_symlink "$DOTFILES_DIR/.config/biome" ~/.config/biome
-create_symlink "$DOTFILES_DIR/.config/kanshi" ~/.config/kanshi
+for config_dir in "$DOTFILES_DIR/.config"/*; do
+    if [ -d "$config_dir" ]; then
+        config_name=$(basename "$config_dir")
+        echo "🔗 Linking $config_name..."
+        create_symlink "$config_dir" ~/.config/"$config_name"
+    fi
+done
 
 # Make scripts executable and add to PATH if needed
 if [ -d "$DOTFILES_DIR/scripts" ]; then
