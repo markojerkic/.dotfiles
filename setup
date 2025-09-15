@@ -1,6 +1,23 @@
 #!/usr/bin/env bash
 set -e
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Parse command line arguments
+UPDATE_FLAG=false
+while getopts "u" opt; do
+    case $opt in
+        u)
+            UPDATE_FLAG=true
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG" >&2
+            echo "Usage: $0 [-u]"
+            echo "  -u: Run system updates"
+            exit 1
+            ;;
+    esac
+done
+
 echo "Setting up dotfiles from $DOTFILES_DIR..."
 
 # Ensure ~/.config exists
@@ -35,9 +52,13 @@ install_deps() {
 
     echo "📦 Installing/updating system packages..."
 
-    # System update first
-    echo "🔄 Updating system..."
-    sudo pacman -Syu --noconfirm
+    # System update first (only if -u flag is passed)
+    if [ "$UPDATE_FLAG" = true ]; then
+        echo "🔄 Updating system..."
+        sudo pacman -Syu --noconfirm
+    else
+        echo "⏭️  Skipping system update (use -u flag to enable updates)"
+    fi
 
     # List of packages to install
     local packages=(
