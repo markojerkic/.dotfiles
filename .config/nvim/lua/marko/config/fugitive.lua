@@ -121,6 +121,88 @@ M.setup = function()
 			:find()
 	end
 
+	local git_show_origin_file = function(opts)
+		opts = opts or {}
+
+		local results = utils.get_os_command_output({ "git", "branch", "-r" })
+		local branches = {}
+		
+		for _, line in ipairs(results) do
+			local clean_line = line:gsub("%s+", "")
+			if clean_line:match("^origin/") and not clean_line:match("HEAD") then
+				table.insert(branches, clean_line)
+			end
+		end
+
+		pickers
+			.new(opts, {
+				prompt_title = "Select Origin Branch",
+				finder = finders.new_table({
+					results = branches,
+					entry_maker = function(line)
+						return {
+							value = line,
+							ordinal = line,
+							display = line,
+						}
+					end,
+				}),
+				sorter = sorters.get_generic_fuzzy_sorter(),
+				attach_mappings = function(prompt_bufnr, _)
+					local select_branch = function()
+						local selection = action_state.get_selected_entry()
+						actions.close(prompt_bufnr)
+						local selected_branch = selection.value
+
+						local success, file_results = pcall(utils.get_os_command_output, { "git", "ls-tree", "-r", "--name-only", selected_branch })
+						
+						if not success or #file_results == 0 then
+							vim.notify("No files found in branch: " .. selected_branch, vim.log.levels.WARN)
+							return
+						end
+						
+						pickers
+							.new(opts, {
+								prompt_title = "Select File from " .. selected_branch,
+								finder = finders.new_table({
+									results = file_results,
+									entry_maker = function(line)
+										return {
+											value = line,
+											ordinal = line,
+											display = line,
+										}
+									end,
+								}),
+								sorter = sorters.get_generic_fuzzy_sorter(),
+								attach_mappings = function(file_prompt_bufnr, _)
+									local select_file = function()
+										local file_selection = action_state.get_selected_entry()
+										actions.close(file_prompt_bufnr)
+										local selected_file = file_selection.value
+										
+										local show_success = pcall(vim.cmd, "Git show " .. selected_branch .. ":" .. selected_file)
+										if not show_success then
+											vim.notify("Failed to show file: " .. selected_file .. " from " .. selected_branch, vim.log.levels.ERROR)
+										end
+									end
+
+									actions.select_default:replace(select_file)
+									return true
+								end,
+							})
+							:find()
+					end
+
+					actions.select_default:replace(select_branch)
+					return true
+				end,
+			})
+			:find()
+	end
+
+	vim.api.nvim_create_user_command("GitShowOriginFile", git_show_origin_file, {})
+
 	local Marko_Fugitive = vim.api.nvim_create_augroup("Marko_Fugitive", {})
 
 	local autocmd = vim.api.nvim_create_autocmd
