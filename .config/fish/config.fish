@@ -52,3 +52,4 @@ set -x N_PREFIX "$HOME/n"; contains "$N_PREFIX/bin" $PATH; or set -a PATH "$N_PR
 
 # opencode
 fish_add_path /home/marko/.opencode/bin
+~/.local/bin/mise activate fish | source
