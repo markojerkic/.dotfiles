@@ -19,6 +19,7 @@ set -gx BUN_INSTALL $HOME/.bun
 set -gx FLYCTL_INSTALL $HOME/.fly
 set -gx SDKMAN_DIR $HOME/.sdkman
 set -gx PNPM_HOME /home/marko/.local/share/pnpm
+set -gx SSH_AUTH_SOCK $HOME/.1password/agent.sock
 
 # PATH additions
 set -gx PATH $BUN_INSTALL/bin $PATH

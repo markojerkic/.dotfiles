@@ -1,4 +1,4 @@
-theme = rose-pine-moon
+theme = Catppuccin Mocha
 fullscreen = false
 background-opacity = 0.85
 gtk-titlebar = false
