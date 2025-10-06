@@ -13,7 +13,7 @@ M.lsp_keymap = function(opts)
 
     vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
     vim.keymap.set("n", "<A-l>", function()
-        require("conform").format({ bufnr = vim.api.nvim_get_current_buf() })
+        require("conform").format({ bufnr = vim.api.nvim_get_current_buf(), timeout_ms = 10000 })
     end, opts)
     vim.keymap.set("n", "<leader>vws", function() vim.lsp.buf.workspace_symbol() end, opts)
     vim.keymap.set("n", "<leader>vd", function() vim.diagnostic.open_float() end, opts)
