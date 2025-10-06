@@ -1,12 +1,5 @@
 #!/usr/bin/env bash
 
-# Flag -t "path" is for target directory
-if [[ $# -eq 2 ]]; then
-    target=$2
-else
-    target=~/dev
-fi
+dirs=$({ printf '%s\n' ~/dev ~/Downloads ~/Slike/WP; fd -d 4 -t d "" ~/dev ~/Downloads; })
 
-dirs=$(stribog-options $target)
-
-echo "$dirs" | fzf --reverse --preview 'echo {}' --preview-window=right:30%:wrap --preview="ls {}"
+echo "$dirs" | fzf

@@ -74,6 +74,7 @@ install_deps() {
         "curl"           # Download tool
         "unzip"          # Archive extraction
         "base-devel"     # Build tools
+        "fd"             # Find/stribog replacement
     )
 
     local to_install=()
@@ -107,6 +108,7 @@ echo "🔗 Creating symlinks for home directory configs..."
 create_symlink "$DOTFILES_DIR/.tmux.conf" ~/.tmux.conf
 create_symlink "$DOTFILES_DIR/.gitconfig" ~/.gitconfig
 create_symlink "$DOTFILES_DIR/.zshrc" ~/.zshrc
+create_symlink ~/Downloads ~/Preuzimanja
 
 # .config directory configs
 echo "🔗 Creating symlinks for .config directory configs..."
