@@ -11,6 +11,7 @@ if status is-interactive
     alias g 'git status'
     alias gap 'git add -p .'
     alias air '~/go/bin/air'
+    alias fd 'fdfind'
 end
 
 # Environment variables

@@ -7,14 +7,15 @@ return {
             local home = os.getenv("HOME")
             local jar_dir = home .. "/.local/share/nvim/google-java-format"
             local jar_path = jar_dir .. "/google-java-format-1.17.0-all-deps.jar"
-            
+
             -- Create directory if it doesn't exist
             vim.fn.mkdir(jar_dir, "p")
-            
+
             -- Download jar if it doesn't exist
             if vim.fn.filereadable(jar_path) == 0 then
                 vim.notify("Downloading Google Java Format v1.17.0...")
-                local url = "https://github.com/google/google-java-format/releases/download/v1.17.0/google-java-format-1.17.0-all-deps.jar"
+                local url =
+                "https://github.com/google/google-java-format/releases/download/v1.17.0/google-java-format-1.17.0-all-deps.jar"
                 local cmd = string.format("curl -L -o '%s' '%s'", jar_path, url)
                 local result = vim.fn.system(cmd)
                 if vim.v.shell_error == 0 then
@@ -24,10 +25,10 @@ return {
                     return nil
                 end
             end
-            
+
             return jar_path
         end
-        
+
         local java_formatter_jar = setup_google_java_format()
         local sql_formatter = os.getenv("HOME")
             .. "/.local/share/nvim/mason/packages/sql-formatter/node_modules/sql-formatter/bin/sql-formatter-cli.cjs"
@@ -79,10 +80,10 @@ return {
                 },
             },
             format_after_save = function(bufnr)
-                if vim.bo[bufnr].filetype == "java" then
-                    -- Disable auto-format for Java, use manual formatting instead
-                    return
-                end
+                -- if vim.bo[bufnr].filetype == "java" then
+                --     -- Disable auto-format for Java, use manual formatting instead
+                --     return
+                -- end
                 return {
                     lsp_format = "fallback",
                     timeout_ms = 5000,

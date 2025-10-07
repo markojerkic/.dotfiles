@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-dirs=$({ printf '%s\n' ~/dev ~/Downloads ~/Slike/WP; fd -d 4 -t d "" ~/dev ~/Downloads; })
+dirs=$({ printf '%s\n' ~/dev ~/Downloads ~/Slike/WP; fdfind -d 4 -t d "" ~/dev ~/Downloads; })
 
 echo "$dirs" | fzf
