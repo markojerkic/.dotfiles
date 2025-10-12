@@ -11,6 +11,10 @@ if status is-interactive
     alias g 'git status'
     alias gap 'git add -p .'
     alias air '~/go/bin/air'
+end
+
+# if is wsl
+if test -d /mnt/c
     alias fd 'fdfind'
 end
 
