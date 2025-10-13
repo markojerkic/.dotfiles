@@ -30,24 +30,14 @@ return {
         end
 
         local java_formatter_jar = setup_google_java_format()
-        local sql_formatter = os.getenv("HOME")
-            .. "/.local/share/nvim/mason/packages/sql-formatter/node_modules/sql-formatter/bin/sql-formatter-cli.cjs"
-
         require("conform").setup({
             formatters_by_ft = {
                 lua = { "stylua", lsp_format = "fallback" },
-                -- Conform will run multiple formatters sequentially
                 python = { "isort", "black" },
-                -- You can customize some of the format options for the filetype (:help conform.format)
                 rust = { "rustfmt", lsp_format = "fallback" },
-
                 java = { "google_java_format_v115" },
-
                 markdown = { "prettier" },
-
                 templ = { "templ" },
-
-                -- Conform will run the first available formatter
                 javascript = { "biome", "prettier", stop_after_first = true },
                 javascriptreact = { "biome", "prettier", stop_after_first = true },
                 typescript = { "biome", "prettier", stop_after_first = true },
@@ -56,7 +46,7 @@ return {
                 json = { "biome", "prettier", stop_after_first = true },
                 html = { "prettier" },
                 css = { "biome", "prettier", stop_after_first = true },
-                sql = { "sqlfmt", lsp_format = "fallback", stop_after_first = true },
+                sql = { "psqlfmt", "sqlfmt", stop_after_first = true },
             },
             formatters = {
                 google_java_format_v115 = {
@@ -73,17 +63,18 @@ return {
                         return java_formatter_jar ~= nil
                     end,
                 },
+                psqlfmt = {
+                    command = "sql-formatter",
+                    args = { "-l", "postgresql" },
+                    stdin = true,
+                },
                 sqlfmt = {
-                    command = sql_formatter,
+                    command = "sql-formatter",
                     args = {},
                     stdin = true,
                 },
             },
             format_after_save = function(bufnr)
-                -- if vim.bo[bufnr].filetype == "java" then
-                --     -- Disable auto-format for Java, use manual formatting instead
-                --     return
-                -- end
                 return {
                     lsp_format = "fallback",
                     timeout_ms = 5000,
