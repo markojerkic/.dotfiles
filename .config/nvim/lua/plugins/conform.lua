@@ -3,8 +3,8 @@ return {
     opts = {},
     config = function()
         -- Setup Google Java Format v1.17
+        local home = os.getenv("HOME")
         local function setup_google_java_format()
-            local home = os.getenv("HOME")
             local jar_dir = home .. "/.local/share/nvim/google-java-format"
             local jar_path = jar_dir .. "/google-java-format-1.17.0-all-deps.jar"
 
@@ -65,12 +65,12 @@ return {
                 },
                 psqlfmt = {
                     command = "sql-formatter",
-                    args = { "-l", "postgresql" },
+                    args = { "-l", "postgresql", "-c", home .. "/.config/sql-formatter/.sqlformatter.json" },
                     stdin = true,
                 },
                 sqlfmt = {
                     command = "sql-formatter",
-                    args = {},
+                    args = { "-c", home .. "/.config/sql-formatter/.sqlformatter.json" },
                     stdin = true,
                 },
             },
