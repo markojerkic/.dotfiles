@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
-dirs=$({ printf '%s\n' ~/dev ~/Downloads ~/Slike/WP ~/dev/.dotfiles; fdfind -d 4 -t d "" ~/dev ~/Downloads; })
+# if fd command is installed, use it
+
+if command -v fd &> /dev/null
+then
+    dirs=$({ printf '%s\n' ~/dev ~/Downloads ~/Slike/WP ~/dev/.dotfiles; fd -d 4 -t d "" ~/dev ~/Downloads; })
+else
+    dirs=$({ printf '%s\n' ~/dev ~/Downloads ~/Slike/WP ~/dev/.dotfiles; fdfind -d 4 -t d "" ~/dev ~/Downloads; })
+fi
 
 echo "$dirs" | fzf
