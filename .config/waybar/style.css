@@ -81,3 +81,23 @@ tooltip {
 #custom-screenrecording-indicator.active {
   color: #a55555;
 }
+
+#cpu {
+  color: #81a1c1;
+}
+
+#battery {
+  color: #a3be8c;
+}
+
+#network {
+  color: #88c0d0;
+}
+
+#bluetooth {
+  color: #b48ead;
+}
+
+#pulseaudio {
+  color: #ebcb8b;
+}
