@@ -16,7 +16,7 @@ keymap("", "<Space>", "<Nop>", opts)
 
 keymap("n", "<C-e>", "<cmd>:Oil<CR>", opts)
 keymap("n", "<S-e>", function()
-	require("oil").open_float()
+    require("oil").open_float()
 end, opts)
 
 -- Normal --
@@ -48,13 +48,23 @@ keymap("n", "<leader>cp", [["+p]])
 
 -- Open a file in a new tab
 keymap("n", "<leader>T", ":tabedit %<CR>", opts)
+-- Tab navigations alt + number
+keymap("n", "<A-1>", "1gt", opts)
+keymap("n", "<A-2>", "2gt", opts)
+keymap("n", "<A-3>", "3gt", opts)
+keymap("n", "<A-4>", "4gt", opts)
+keymap("n", "<A-5>", "5gt", opts)
+keymap("n", "<A-6>", "6gt", opts)
+keymap("n", "<A-7>", "7gt", opts)
+keymap("n", "<A-8>", "8gt", opts)
+keymap("n", "<A-9>", "9gt", opts)
 
 -- Delete to void register
 keymap({ "n", "v" }, "<leader>d", [["_d]])
 
 keymap({ "n", "t" }, "<C-s>", "<cmd>silent !tmux neww switch-session<CR>")
 keymap({ "n", "t" }, "<A-o>", function()
-	require("marko.util.colors").toggleColouredPencils()
+    require("marko.util.colors").toggleColouredPencils()
 end)
 
 -- Quickfix errors
