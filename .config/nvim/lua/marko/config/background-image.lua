@@ -1,4 +1,5 @@
 local M = {}
+local Snacks = require("snacks")
 
 local function check_requirements()
     local chafa = vim.fn.executable('chafa')
@@ -15,45 +16,56 @@ function M.setup()
         return
     end
 
-    local builtin = require('telescope.builtin')
-    local actions = require('telescope.actions')
-    local previewers = require('telescope.previewers')
-
     local image_preview = function(opts)
         opts = opts or {}
 
-        -- Use Telescope's built-in file picker with a specific path
-        builtin.find_files({
-            prompt_title = "Images in WP",
-            cwd = "~/Slike/WP",
-            file_ignore_patterns = { "*" }, -- Clear any ignore patterns
-            previewer = previewers.new_termopen_previewer({
-                get_command = function(entry)
-                    local width = math.floor(vim.o.columns / 2.2)
-                    local height = math.floor(width * 0.3) -- Calculate proportional height
-                    print("Image size: " .. string.format('%dx%d', width, height))
+        -- Get image files from the WP directory
+        local wp_dir = vim.fn.expand("~/Slike/WP")
+        local cmd = string.format("find '%s' -type f \\( -name '*.jpg' -o -name '*.png' -o -name '*.jpeg' -o -name '*.gif' -o -name '*.bmp' \\)", wp_dir)
+        local results = vim.fn.systemlist(cmd)
+        local images = {}
+        
+        for _, image in ipairs(results) do
+            if image and image ~= "" and not image:match("^find:") then
+                table.insert(images, {
+                    text = vim.fn.fnamemodify(image, ":t"),
+                    file = image,
+                    path = image,
+                })
+            end
+        end
 
-                    return {
-                        'chafa',
-                        entry.path,
-                        '--format', 'symbols',
-                        '--symbols', 'vhalf',
-                        '--size', string.format('%dx%d', width, height),
-                        '--stretch'
-                    }
-                end
-            }),
-            attach_mappings = function(prompt_bufnr)
-                actions.select_default:replace(function()
-                    local selection = require('telescope.actions.state').get_selected_entry()
-                    actions.close(prompt_bufnr)
+        print("Found " .. #images .. " images in " .. wp_dir)
+        
+        if #images == 0 then
+            vim.notify("No images found in " .. wp_dir, vim.log.levels.WARN)
+            return
+        end
 
-                    if selection and selection.path then
-                        -- run in new process
-                        vim.fn.jobstart(string.format('cb %s', selection.path))
+        Snacks.picker.pick({
+            items = images,
+            prompt = "Images in WP",
+            format = "text",
+            preview = "image",
+            confirm = function(picker, item)
+                picker:close()
+                if item and item.path then
+                    -- run in new process
+                    local job_id = vim.fn.jobstart(string.format('cb %s', item.path), {
+                        on_exit = function(_, exit_code)
+                            if exit_code == 0 then
+                                vim.notify("Image copied: " .. vim.fn.fnamemodify(item.path, ":t"), vim.log.levels.INFO)
+                            else
+                                vim.notify("Failed to copy image (exit code: " .. exit_code .. ")", vim.log.levels.ERROR)
+                            end
+                        end
+                    })
+                    if job_id == 0 then
+                        vim.notify("Invalid command: cb", vim.log.levels.ERROR)
+                    elseif job_id == -1 then
+                        vim.notify("Command 'cb' not executable", vim.log.levels.ERROR)
                     end
-                end)
-                return true
+                end
             end
         })
     end

@@ -1,4 +1,5 @@
 local M = {}
+local Snacks = require("snacks")
 
 local function check_requirements()
     local stribog = vim.fn.executable('stribog-options')
@@ -21,38 +22,41 @@ function M.setup()
         return
     end
 
-    local builtin = require('telescope.builtin')
-    local actions = require('telescope.actions')
-    local previewers = require('telescope.previewers')
-
     local dir_preview = function(opts)
         opts = opts or {}
 
-        -- Create a custom finder that uses stribog-select
-        builtin.find_files({
-            prompt_title = "Directories",
-            find_command = { "stribog-options" },
-            previewer = previewers.new_termopen_previewer({
-                get_command = function(entry)
-                    -- You can customize the preview command here
-                    -- This example uses 'ls' to show directory contents
-                    return {
-                        'ls',
-                        '-la',
-                        entry.path
-                    }
+        -- Get directories from stribog-options
+        local results = vim.fn.systemlist({ "stribog-options" })
+        local dirs = {}
+        
+        for _, dir in ipairs(results) do
+            if dir and dir ~= "" then
+                table.insert(dirs, {
+                    text = dir,
+                    file = dir,
+                    path = dir,
+                })
+            end
+        end
+
+        print("Found " .. #dirs .. " directories")
+        
+        if #dirs == 0 then
+            vim.notify("No directories found from stribog-options", vim.log.levels.WARN)
+            return
+        end
+
+        Snacks.picker.pick({
+            items = dirs,
+            prompt = "Directories",
+            format = "text",
+            preview = "directory",
+            confirm = function(picker, item)
+                picker:close()
+                if item and item.path then
+                    -- Run tmux-sessionizer with the selected path
+                    vim.fn.jobstart(string.format('tmux-sessionizer %s', item.path))
                 end
-            }),
-            attach_mappings = function(prompt_bufnr)
-                actions.select_default:replace(function()
-                    local selection = require('telescope.actions.state').get_selected_entry()
-                    actions.close(prompt_bufnr)
-                    if selection and selection.path then
-                        -- Run tmux-sessionizer with the selected path
-                        vim.fn.jobstart(string.format('tmux-sessionizer %s', selection.path))
-                    end
-                end)
-                return true
             end
         })
     end

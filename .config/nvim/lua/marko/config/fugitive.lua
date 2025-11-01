@@ -1,204 +1,144 @@
 local M = {}
+local Snacks = require("snacks")
 
 M.setup = function()
 	vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
 
-	local actions = require("telescope.actions")
-	local action_state = require("telescope.actions.state")
-	local finders = require("telescope.finders")
-	local pickers = require("telescope.pickers")
-	local sorters = require("telescope.sorters")
-	local utils = require("telescope.utils")
-
 	local git_delete = function(opts)
 		opts = opts or {}
 
-		local results = utils.get_os_command_output({ "git", "branch" })
-		local branches = results
+		local results = vim.fn.systemlist({ "git", "branch" })
+		local branches = {}
 
-		pickers
-			.new(opts, {
-				prompt_title = "Git Delete Branch",
-				finder = finders.new_table({
-					results = branches,
-					entry_maker = function(line)
-						return {
-							value = line,
-							ordinal = line,
-							display = line,
-						}
-					end,
-				}),
-				sorter = sorters.get_generic_fuzzy_sorter(),
-				attach_mappings = function(prompt_bufnr, _)
-					local switch_selection = function()
-						local selection = action_state.get_selected_entry()
-						actions.close(prompt_bufnr)
-						local selected_branch = selection.value:gsub("%s+", ""):gsub("%*", "")
-						vim.cmd("Git branch -d " .. selected_branch)
-					end
-
-					-- Use telescope actions to handle key mappings
-					actions.select_default:replace(switch_selection)
-
-					return true
-				end,
+		for _, line in ipairs(results) do
+			table.insert(branches, {
+				text = line,
+				value = line:gsub("%s+", ""):gsub("%*", ""),
 			})
-			:find()
+		end
+
+		Snacks.picker.pick({
+			items = branches,
+			prompt = "Git Delete Branch",
+			format = "text",
+			preview = "git_log",
+			confirm = function(picker, item)
+				picker:close()
+				local selected_branch = item.value
+				vim.cmd("Git branch -d " .. selected_branch)
+			end
+		})
 	end
 
 	local git_switch = function(opts)
 		opts = opts or {}
 
-		local results = utils.get_os_command_output({ "git", "branch" })
-		local branches = results
+		local results = vim.fn.systemlist({ "git", "branch" })
+		local branches = {}
 
-		pickers
-			.new(opts, {
-				prompt_title = "Git Switch",
-				finder = finders.new_table({
-					results = branches,
-					entry_maker = function(line)
-						return {
-							value = line,
-							ordinal = line,
-							display = line,
-						}
-					end,
-				}),
-				sorter = sorters.get_generic_fuzzy_sorter(),
-				attach_mappings = function(prompt_bufnr, _)
-					local switch_selection = function()
-						local selection = action_state.get_selected_entry()
-						actions.close(prompt_bufnr)
-						local selected_branch = selection.value:gsub("%s+", ""):gsub("%*", "")
-						vim.cmd("Git switch " .. selected_branch)
-					end
-
-					-- Use telescope actions to handle key mappings
-					actions.select_default:replace(switch_selection)
-
-					return true
-				end,
+		for _, line in ipairs(results) do
+			table.insert(branches, {
+				text = line,
+				value = line:gsub("%s+", ""):gsub("%*", ""),
 			})
-			:find()
+		end
+
+		Snacks.picker.pick({
+			items = branches,
+			prompt = "Git Switch",
+			format = "text",
+			preview = "git_log",
+			confirm = function(picker, item)
+				picker:close()
+				local selected_branch = item.value
+				vim.cmd("Git switch " .. selected_branch)
+			end
+		})
 	end
 
 	local git_switch_remote = function(opts)
 		opts = opts or {}
 
-		local results = utils.get_os_command_output({ "git", "branch", "-r" })
-		local branches = results
+		local results = vim.fn.systemlist({ "git", "branch", "-r" })
+		local branches = {}
 
-		pickers
-			.new(opts, {
-				prompt_title = "Git Switch Remote",
-				finder = finders.new_table({
-					results = branches,
-					entry_maker = function(line)
-						return {
-							value = line,
-							ordinal = line,
-							display = line,
-						}
-					end,
-				}),
-				sorter = sorters.get_generic_fuzzy_sorter(),
-				attach_mappings = function(prompt_bufnr, _)
-					local switch_selection = function()
-						local selection = action_state.get_selected_entry()
-						actions.close(prompt_bufnr)
-						local selected_branch = selection.value:gsub("%s+", ""):gsub("%*", "")
-						vim.cmd("Git checkout " .. selected_branch .. " --track")
-					end
-
-					-- Use telescope actions to handle key mappings
-					actions.select_default:replace(switch_selection)
-
-					return true
-				end,
+		for _, line in ipairs(results) do
+			table.insert(branches, {
+				text = line,
+				value = line:gsub("%s+", ""):gsub("%*", ""),
 			})
-			:find()
+		end
+
+		Snacks.picker.pick({
+			items = branches,
+			prompt = "Git Switch Remote",
+			format = "text",
+			preview = "git_log",
+			confirm = function(picker, item)
+				picker:close()
+				local selected_branch = item.value
+				vim.cmd("Git checkout " .. selected_branch .. " --track")
+			end
+		})
 	end
 
 	local git_show_origin_file = function(opts)
 		opts = opts or {}
 
-		local results = utils.get_os_command_output({ "git", "branch", "-r" })
+		local results = vim.fn.systemlist({ "git", "branch", "-r" })
 		local branches = {}
 		
 		for _, line in ipairs(results) do
 			local clean_line = line:gsub("%s+", "")
 			if clean_line:match("^origin/") and not clean_line:match("HEAD") then
-				table.insert(branches, clean_line)
+				table.insert(branches, {
+					text = clean_line,
+					value = clean_line,
+				})
 			end
 		end
 
-		pickers
-			.new(opts, {
-				prompt_title = "Select Origin Branch",
-				finder = finders.new_table({
-					results = branches,
-					entry_maker = function(line)
-						return {
-							value = line,
-							ordinal = line,
-							display = line,
-						}
-					end,
-				}),
-				sorter = sorters.get_generic_fuzzy_sorter(),
-				attach_mappings = function(prompt_bufnr, _)
-					local select_branch = function()
-						local selection = action_state.get_selected_entry()
-						actions.close(prompt_bufnr)
-						local selected_branch = selection.value
+		Snacks.picker.pick({
+			items = branches,
+			prompt = "Select Origin Branch",
+			format = "text",
+			preview = "git_log",
+			confirm = function(picker, item)
+				picker:close()
+				local selected_branch = item.value
 
-						local success, file_results = pcall(utils.get_os_command_output, { "git", "ls-tree", "-r", "--name-only", selected_branch })
+				local success, file_results = pcall(vim.fn.systemlist, { "git", "ls-tree", "-r", "--name-only", selected_branch })
+				
+				if not success or #file_results == 0 then
+					vim.notify("No files found in branch: " .. selected_branch, vim.log.levels.WARN)
+					return
+				end
+				
+				local files = {}
+				for _, file in ipairs(file_results) do
+					table.insert(files, {
+						text = file,
+						value = file,
+						file = file,
+					})
+				end
+				
+				Snacks.picker.pick({
+					items = files,
+					prompt = "Select File from " .. selected_branch,
+					format = "text",
+					confirm = function(picker2, file_item)
+						picker2:close()
+						local selected_file = file_item.value
 						
-						if not success or #file_results == 0 then
-							vim.notify("No files found in branch: " .. selected_branch, vim.log.levels.WARN)
-							return
+						local show_success = pcall(vim.cmd, "Git show " .. selected_branch .. ":" .. selected_file)
+						if not show_success then
+							vim.notify("Failed to show file: " .. selected_file .. " from " .. selected_branch, vim.log.levels.ERROR)
 						end
-						
-						pickers
-							.new(opts, {
-								prompt_title = "Select File from " .. selected_branch,
-								finder = finders.new_table({
-									results = file_results,
-									entry_maker = function(line)
-										return {
-											value = line,
-											ordinal = line,
-											display = line,
-										}
-									end,
-								}),
-								sorter = sorters.get_generic_fuzzy_sorter(),
-								attach_mappings = function(file_prompt_bufnr, _)
-									local select_file = function()
-										local file_selection = action_state.get_selected_entry()
-										actions.close(file_prompt_bufnr)
-										local selected_file = file_selection.value
-										
-										local show_success = pcall(vim.cmd, "Git show " .. selected_branch .. ":" .. selected_file)
-										if not show_success then
-											vim.notify("Failed to show file: " .. selected_file .. " from " .. selected_branch, vim.log.levels.ERROR)
-										end
-									end
-
-									actions.select_default:replace(select_file)
-									return true
-								end,
-							})
-							:find()
 					end
-
-					actions.select_default:replace(select_branch)
-					return true
-				end,
-			})
-			:find()
+				})
+			end
+		})
 	end
 
 	vim.api.nvim_create_user_command("GitShowOriginFile", git_show_origin_file, {})

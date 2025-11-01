@@ -1,15 +1,14 @@
 local M = {}
-local drop_down_theme = require("marko.util.telescope").dropdown
+local Snacks = require("snacks")
 
 M.lsp_keymap = function(opts)
-    local telescope = require('telescope.builtin')
     vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
-    vim.keymap.set("n", "<leader>gd", function() telescope.lsp_definitions(drop_down_theme) end, opts)
-    vim.keymap.set("n", "gr", function() telescope.lsp_references(drop_down_theme) end, opts)
+    vim.keymap.set("n", "<leader>gd", function() Snacks.picker.lsp_definitions() end, opts)
+    vim.keymap.set("n", "gr", function() Snacks.picker.lsp_references() end, opts)
     vim.keymap.set("n", "<leader>gr", function() vim.lsp.buf.references() end, opts)
-    vim.keymap.set("n", "<leader>gtr", function() telescope.lsp_references(drop_down_theme) end, opts)
+    vim.keymap.set("n", "<leader>gtr", function() Snacks.picker.lsp_references() end, opts)
     vim.keymap.set("n", "gi", function() vim.lsp.buf.implementation() end, opts)
-    vim.keymap.set("n", "<leader>gi", function() telescope.lsp_implementations(drop_down_theme) end, opts)
+    vim.keymap.set("n", "<leader>gi", function() Snacks.picker.lsp_implementations() end, opts)
 
     vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
     vim.keymap.set("n", "<A-l>", function()
