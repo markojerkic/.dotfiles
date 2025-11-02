@@ -1,18 +1,18 @@
 -- Shared exclude patterns for file pickers
 -- These use glob patterns (not Lua patterns) since they're passed to fd/rg/find
 local file_excludes = {
-    "api/v1",           -- Exclude api/v1 directory and all its contents
-    "*.min.css",        -- Minified CSS files
-    "*.min.js",         -- Minified JS files
-    "*.lock",           -- Lock files
-    "*.lockb",          -- Bun lock files
-    "*.crt",            -- Certificate files
-    "*.csr",            -- Certificate signing request
-    "*.key",            -- Key files
-    "*.cert",           -- Certificate files
-    "*.ico",            -- Icon files
-    "*.png",            -- PNG images
-    "*.jpg",            -- JPG images
+    "api/v1",    -- Exclude api/v1 directory and all its contents
+    "*.min.css", -- Minified CSS files
+    "*.min.js",  -- Minified JS files
+    "*.lock",    -- Lock files
+    "*.lockb",   -- Bun lock files
+    "*.crt",     -- Certificate files
+    "*.csr",     -- Certificate signing request
+    "*.key",     -- Key files
+    "*.cert",    -- Certificate files
+    "*.ico",     -- Icon files
+    "*.png",     -- PNG images
+    "*.jpg",     -- JPG images
 }
 
 local config = {
@@ -111,9 +111,9 @@ return {
             end,
             desc = "Colorscheme"
         },
-        { "<leader>tr", function() require("snacks").picker.resume() end, desc = "Resume Picker" },
-        { "<leader>t",  function() require("snacks").picker() end,        desc = "Pickers" },
-        { "<leader>pp", function() require("snacks").picker.help() end,   desc = "Help" },
+        { "<leader>tr", function() require("snacks").picker.resume() end,       desc = "Resume Picker" },
+        { "<leader>t",  function() require("snacks").picker() end,              desc = "Pickers" },
+        { "<leader>pp", function() require("snacks").picker.help() end,         desc = "Help" },
         -- Git file history
         { "<leader>gf", function() require("snacks").picker.git_log_file() end, desc = "Git Log (Current File)" },
         { "<leader>gl", function() require("snacks").picker.git_log_line() end, desc = "Git Log (Current Line)" },
