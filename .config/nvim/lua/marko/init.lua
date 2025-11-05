@@ -1,5 +1,6 @@
 require("marko.set")
 require("marko.remap")
+require("marko.commands")
 
 local augroup = vim.api.nvim_create_augroup
 local markoGroup = augroup('marko', {})
@@ -27,5 +28,6 @@ autocmd({"BufWritePre"}, {
     pattern = "*",
     command = [[%s/\s\+$//e]],
 })
+
 
 

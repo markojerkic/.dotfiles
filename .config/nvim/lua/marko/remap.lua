@@ -62,7 +62,6 @@ keymap("n", "<A-9>", "9gt", opts)
 -- Delete to void register
 keymap({ "n", "v" }, "<leader>d", [["_d]])
 
-keymap({ "n", "t" }, "<C-s>", "<cmd>silent !tmux neww switch-session<CR>")
 keymap({ "n", "t" }, "<A-o>", function()
     require("marko.util.colors").toggleColouredPencils()
 end)
