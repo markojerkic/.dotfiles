@@ -2,40 +2,17 @@ return {
     "stevearc/conform.nvim",
     opts = {},
     config = function()
-        -- Setup Google Java Format v1.17
         local home = os.getenv("HOME")
-        local function setup_google_java_format()
-            local jar_dir = home .. "/.local/share/nvim/google-java-format"
-            local jar_path = jar_dir .. "/google-java-format-1.17.0-all-deps.jar"
+        local java_setup = require("marko.util.java-formatter").setup()
+        local java_formatter_jar = java_setup.jar_path
+        local java21_path = java_setup.java_path
 
-            -- Create directory if it doesn't exist
-            vim.fn.mkdir(jar_dir, "p")
-
-            -- Download jar if it doesn't exist
-            if vim.fn.filereadable(jar_path) == 0 then
-                vim.notify("Downloading Google Java Format v1.17.0...")
-                local url =
-                "https://github.com/google/google-java-format/releases/download/v1.17.0/google-java-format-1.17.0-all-deps.jar"
-                local cmd = string.format("curl -L -o '%s' '%s'", jar_path, url)
-                local result = vim.fn.system(cmd)
-                if vim.v.shell_error == 0 then
-                    vim.notify("Google Java Format v1.17.0 downloaded successfully")
-                else
-                    vim.notify("Failed to download Google Java Format: " .. result, vim.log.levels.ERROR)
-                    return nil
-                end
-            end
-
-            return jar_path
-        end
-
-        local java_formatter_jar = setup_google_java_format()
         require("conform").setup({
             formatters_by_ft = {
                 lua = { "stylua", lsp_format = "fallback" },
                 python = { "isort", "black" },
                 rust = { "rustfmt", lsp_format = "fallback" },
-                java = { "google_java_format_v115" },
+                java = { "google_java_format_v115", lsp_format = "fallback" },
                 markdown = { "prettier" },
                 templ = { "templ" },
                 javascript = { "biome", "prettier", stop_after_first = true },
@@ -50,7 +27,9 @@ return {
             },
             formatters = {
                 google_java_format_v115 = {
-                    command = "java",
+                    command = function()
+                        return java21_path or "java"
+                    end,
                     args = function()
                         if java_formatter_jar then
                             return { "-jar", java_formatter_jar, "-" }
@@ -60,7 +39,7 @@ return {
                     end,
                     stdin = true,
                     condition = function()
-                        return java_formatter_jar ~= nil
+                        return java_formatter_jar ~= nil and java21_path ~= nil
                     end,
                 },
                 psqlfmt = {
