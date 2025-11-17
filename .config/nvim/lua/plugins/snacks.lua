@@ -56,6 +56,18 @@ local config = {
     statuscolumn = { enabled = false },
     words = { enabled = false },
     picker = {
+        -- Use current window instead of first window (like Telescope)
+        jump = {
+            reuse_win = true,
+        },
+        -- Custom keymaps
+        win = {
+            input = {
+                keys = {
+                    ["<C-h>"] = { "edit_split", mode = { "n", "i" } },
+                }
+            }
+        },
         -- Custom layout with preview on top
         layout = {
             layout = {
