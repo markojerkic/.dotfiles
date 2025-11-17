@@ -47,3 +47,26 @@ vim.cmd([[let g:ftplugin_sql_omni_key = '<C-j>']])
 for k, v in pairs(options) do
 	vim.opt[k] = v
 end
+
+-- Global border for ALL floating windows
+local border = "rounded"
+
+-- Override nvim_open_win to set border by default
+local orig_nvim_open_win = vim.api.nvim_open_win
+function vim.api.nvim_open_win(buffer, enter, config)
+	config.border = config.border or border
+	return orig_nvim_open_win(buffer, enter, config)
+end
+
+-- LSP floating windows
+local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
+function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
+	opts = opts or {}
+	opts.border = opts.border or border
+	return orig_util_open_floating_preview(contents, syntax, opts, ...)
+end
+
+-- Diagnostic floating window borders
+vim.diagnostic.config({
+	float = { border = border }
+})
