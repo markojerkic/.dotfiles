@@ -80,8 +80,8 @@ local config = {
                 border = "rounded",
                 title = "{title} {live} {flags}",
                 title_pos = "center",
-                { win = "preview", title = "{preview}", height = 0.4,     border = "bottom" },
-                { win = "input",   height = 1,          border = "bottom" },
+                { win = "preview", title = "{preview}", height = 0.4, min_height = 10, border = "bottom" },
+                { win = "input",   height = 1,                            border = "bottom" },
                 { win = "list",    border = "none" },
             }
         },
