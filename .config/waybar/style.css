@@ -35,7 +35,8 @@
 #pulseaudio,
 #custom-omarchy,
 #custom-screenrecording-indicator,
-#custom-update {
+#custom-update,
+#custom-logitech-battery {
   min-width: 12px;
   margin: 0 7.5px;
 }
@@ -100,4 +101,16 @@ tooltip {
 
 #pulseaudio {
   color: #ebcb8b;
+}
+
+#custom-logitech-battery {
+  color: #b48ead;
+}
+
+#custom-logitech-battery.warning {
+  color: #ebcb8b;
+}
+
+#custom-logitech-battery.critical {
+  color: #bf616a;
 }
