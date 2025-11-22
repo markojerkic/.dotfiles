@@ -5,3 +5,6 @@ gtk-titlebar = false
 mouse-hide-while-typing = true
 
 keybind=ctrl+ć=reload_config
+
+# Slowdown mouse scrolling
+mouse-scroll-multiplier = 0.95
