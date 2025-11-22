@@ -19,7 +19,8 @@
         "network",
         "pulseaudio",
         "cpu",
-        "custom/logitech-battery",
+        "custom/logitech-battery-mouse",
+        "custom/logitech-battery-keyboard",
         "battery"
     ],
     "hyprland/workspaces": {
@@ -89,8 +90,14 @@
         "spacing": 1,
         "on-click": "omarchy-launch-wifi"
     },
-    "custom/logitech-battery": {
-        "exec": "/home/marko/dev/.dotfiles/scripts/waybar/logitech-battery.sh",
+    "custom/logitech-battery-mouse": {
+        "exec": "/home/marko/dev/.dotfiles/scripts/waybar/logitech-battery.ts mouse",
+        "return-type": "json",
+        "interval": 200,
+        "tooltip": true
+    },
+    "custom/logitech-battery-keyboard": {
+        "exec": "/home/marko/dev/.dotfiles/scripts/waybar/logitech-battery.ts keyboard",
         "return-type": "json",
         "interval": 200,
         "tooltip": true

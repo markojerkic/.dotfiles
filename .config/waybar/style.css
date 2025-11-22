@@ -103,14 +103,28 @@ tooltip {
   color: #ebcb8b;
 }
 
-#custom-logitech-battery {
+#custom-logitech-battery-mouse {
   color: #b48ead;
+margin-left: 8px;
+margin-right: 8px;
 }
 
-#custom-logitech-battery.warning {
+#custom-logitech-battery-keyboard {
+  color: #babbf1;
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+#custom-logitech-battery-mouse.warning,
+#custom-logitech-battery-keyboard.warning {
   color: #ebcb8b;
+  margin-left: 8px;
+  margin-right: 8px;
 }
 
-#custom-logitech-battery.critical {
+#custom-logitech-battery-mouse.critical,
+#custom-logitech-battery-keyboard.critical {
   color: #bf616a;
+  margin-left: 8px;
+  margin-right: 8px;
 }
