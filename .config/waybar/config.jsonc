@@ -100,13 +100,13 @@
     "custom/logitech-battery-mouse": {
         "exec": "/home/marko/dev/.dotfiles/scripts/waybar/logitech-battery.ts mouse",
         "return-type": "json",
-        "interval": 200,
+        "interval": 60,
         "tooltip": true
     },
     "custom/logitech-battery-keyboard": {
         "exec": "/home/marko/dev/.dotfiles/scripts/waybar/logitech-battery.ts keyboard",
         "return-type": "json",
-        "interval": 200,
+        "interval": 60,
         "tooltip": true
     },
     "battery": {
