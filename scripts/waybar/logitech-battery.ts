@@ -80,7 +80,7 @@ if (mouse === undefined && keyboard === undefined) {
         Bun.file(configPath),
         JSON.stringify({ text: "", class: "hidden" }),
     );
-    console.log(JSON.stringify({ text: "", class: "hidden" }));
+    console.log(await Bun.file(configPath).text());
     process.exit(0);
 }
 
