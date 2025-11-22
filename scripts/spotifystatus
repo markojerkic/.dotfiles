@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+status=$(spotifycli --status 2>/dev/null)
+arturl=$(spotifycli --arturl 2>/dev/null)
+
+average_color=""
+if [[ -n "$status" ]]; then
+    average_color=$(convert "$arturl" -scale 1x1\! -format '%[pixel:u]' info:- 2>/dev/null \
+        | sed -e 's/srgb(\([0-9.]*\)%,\([0-9.]*\)%,\([0-9.]*\)%)/\1 \2 \3/' \
+        | awk '{printf "#%02x%02x%02x\n", $1*2.55, $2*2.55, $3*2.55}' 2>/dev/null)
+fi
+
+if [[ -z "$average_color" ]]; then
+    average_color="#a6e3a1" # Default fallback color
+fi
+
+echo "<span foreground=\"$average_color\"> $status</span>"

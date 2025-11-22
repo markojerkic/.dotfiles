@@ -6,7 +6,8 @@
     "height": 26,
     "modules-left": [
         "custom/omarchy",
-        "hyprland/workspaces"
+        "hyprland/workspaces",
+        "custom/spotify-status"
     ],
     "modules-center": [
         "clock",
@@ -89,6 +90,11 @@
         "interval": 3,
         "spacing": 1,
         "on-click": "omarchy-launch-wifi"
+    },
+    "custom/spotify-status": {
+        "exec": "spotifystatus",
+        "interval": 10,
+        "on-click": "spotify"
     },
     "custom/logitech-battery-mouse": {
         "exec": "/home/marko/dev/.dotfiles/scripts/waybar/logitech-battery.ts mouse",
