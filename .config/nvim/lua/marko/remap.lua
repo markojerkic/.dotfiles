@@ -26,6 +26,11 @@ keymap("n", "<C-j>", "<C-w>j", opts)
 keymap("n", "<C-k>", "<C-w>k", opts)
 keymap("n", "<C-l>", "<C-w>l", opts)
 
+-- Format
+keymap("n", "<A-l>", function()
+    require("conform").format({ bufnr = vim.api.nvim_get_current_buf(), timeout_ms = 10000 })
+end, opts)
+
 -- Move text up and down
 keymap("n", "<A-j>", "<Esc>:m .+1<CR>==gi", opts)
 keymap("n", "<A-k>", "<Esc>:m .-2<CR>==gi", opts)

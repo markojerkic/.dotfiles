@@ -54,6 +54,10 @@ return {
                 },
             },
             format_after_save = function(bufnr)
+                local file_ext = vim.api.nvim_buf_get_option(bufnr, "filetype")
+                if file_ext == "sql" then
+                    return false
+                end
                 return {
                     lsp_format = "fallback",
                     timeout_ms = 5000,
