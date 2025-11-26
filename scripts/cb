@@ -76,7 +76,7 @@ elif [ -d "$HOME/.config/omarchy" ] && [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]; 
     echo "DEBUG: Converting image for lockscreen with size: $screen_size"
     if command -v magick >/dev/null 2>&1; then
         # Create lockscreen in "fit" mode - image fits entirely with average color background
-        magick "$selected" -resize "${screen_size}>" -gravity center -background "$average_color" -extent "$screen_size" -flatten "$lockscreen_path"
+        magick "$selected" -resize "${screen_size}" -gravity center -background "$average_color" -extent "$screen_size" -flatten "$lockscreen_path"
         echo "DEBUG: Magick command executed (fit mode)"
     elif command -v convert >/dev/null 2>&1; then
         # Create lockscreen in "fit" mode - image fits entirely with average color background
