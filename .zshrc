@@ -152,3 +152,5 @@ export PATH=/home/marko/.opencode/bin:$PATH
 export PATH=/root/.opencode/bin:$PATH
 export PATH="/root/dev/.dotfiles/scripts:$PATH"
 export PATH="/home/marko/dev/.dotfiles/scripts:$PATH"
+
+. "$HOME/.local/share/../bin/env"
