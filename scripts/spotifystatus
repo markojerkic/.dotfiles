@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-status=$(spotifycli --status 2>/dev/null)
+status=$(spotifycli --status 2>/dev/null | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
 arturl=$(spotifycli --arturl 2>/dev/null)
 
 average_color=""
