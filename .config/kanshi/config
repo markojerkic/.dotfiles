@@ -6,5 +6,5 @@ profile hdmi {
 
 # Profile when only laptop screen - use laptop
 profile laptop {
-    output "eDP-1" enable scale 1.2
+    output "eDP-1" enable scale 1
 }

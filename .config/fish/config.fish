@@ -55,5 +55,11 @@ set -gx PATH /home/marko/dev/.dotfiles/scripts $PATH
 
 set -x N_PREFIX "$HOME/n"; contains "$N_PREFIX/bin" $PATH; or set -a PATH "$N_PREFIX/bin"  # Added by n-install (see http://git.io/n-install-repo).
 
+# if task is installed
+if which task > /dev/null
+    # Load task completions
+    task --completion fish | source
+end
+
 # opencode
 fish_add_path /home/marko/.opencode/bin
