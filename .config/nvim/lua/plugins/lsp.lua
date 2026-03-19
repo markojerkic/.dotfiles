@@ -1,3 +1,32 @@
+vim.lsp.config('ts_ls', {
+    settings = {
+        typescript = {
+            inlayHints = {
+                includeInlayParameterNameHints = "all",
+                includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+                includeInlayFunctionParameterTypeHints = false,
+                includeInlayVariableTypeHints = false,
+                includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+                includeInlayPropertyDeclarationTypeHints = false,
+                includeInlayFunctionLikeReturnTypeHints = false,
+                includeInlayEnumMemberValueHints = false,
+            },
+        },
+        javascript = {
+            inlayHints = {
+                includeInlayParameterNameHints = "all",
+                includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+                includeInlayFunctionParameterTypeHints = false,
+                includeInlayVariableTypeHints = false,
+                includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+                includeInlayPropertyDeclarationTypeHints = false,
+                includeInlayFunctionLikeReturnTypeHints = false,
+                includeInlayEnumMemberValueHints = true,
+            },
+        },
+    },
+})
+
 return {
     {
         "williamboman/mason.nvim",
@@ -95,11 +124,15 @@ return {
                 callback = function(event)
                     local opts = { buffer = event.buf }
                     keymaps.lsp_keymap(opts)
+                    local client = vim.lsp.get_client_by_id(event.data.client_id)
+                    if client and client.supports_method('textDocument/inlayHint') then
+                        vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
+                    end
                 end
             })
 
             require("mason-lspconfig").setup({
-                ensure_installed = { "eslint", "jdtls", "ts_ls", "angularls", "lua_ls", "gopls" },
+                ensure_installed = { "eslint", "jdtls", "ts_ls", "angularls", "lua_ls", "gopls", "tailwindcss" },
                 handlers = {
                     -- this first function is the "default handler"
                     -- it applies to every language server without a "custom handler"
@@ -108,39 +141,27 @@ return {
                     end,
 
                     ts_ls = function()
-                        require("lspconfig").ts_ls.setup({
-                            settings = {
-                                typescript = {
-                                    inlayHints = {
-                                        includeInlayParameterNameHints = "all",
-                                        includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-                                        includeInlayFunctionParameterTypeHints = true,
-                                        includeInlayVariableTypeHints = false,
-                                        includeInlayVariableTypeHintsWhenTypeMatchesName = false,
-                                        includeInlayPropertyDeclarationTypeHints = false,
-                                        includeInlayFunctionLikeReturnTypeHints = false,
-                                        includeInlayEnumMemberValueHints = false,
-                                    },
-                                },
-                                javascript = {
-                                    inlayHints = {
-                                        includeInlayParameterNameHints = "all",
-                                        includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-                                        includeInlayFunctionParameterTypeHints = true,
-                                        includeInlayVariableTypeHints = true,
-                                        includeInlayVariableTypeHintsWhenTypeMatchesName = true,
-                                        includeInlayPropertyDeclarationTypeHints = true,
-                                        includeInlayFunctionLikeReturnTypeHints = true,
-                                        includeInlayEnumMemberValueHints = true,
-                                    },
-                                },
-                            },
-                        })
+                        require("lspconfig").ts_ls.setup({})
                     end,
 
                     -- this is the "custom handler" for `lua_ls`
                     lua_ls = function()
                         require("lspconfig").lua_ls.setup({})
+                    end,
+
+                    tailwindcss = function()
+                        require("lspconfig").tailwindcss.setup({
+                            settings = {
+                                tailwindCSS = {
+                                    experimental = {
+                                        configFile = {
+                                            ["src/styles/tailwind.scss"] = "**",
+                                            ["src/styles.scss"] = "**",
+                                        },
+                                    },
+                                },
+                            },
+                        })
                     end,
                 },
             })

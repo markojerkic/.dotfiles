@@ -8,10 +8,10 @@ local function find_java21()
 
     -- Try to find existing Java 21
     local java21_patterns = {
-        "21-tem", -- Temurin
-        "21-open", -- OpenJDK
-        "21.0", -- Generic 21.0.x
-        "21-zulu", -- Zulu
+        "21-tem",    -- Temurin
+        "21-open",   -- OpenJDK
+        "21.0",      -- Generic 21.0.x
+        "21-zulu",   -- Zulu
         "21-oracle", -- Oracle
     }
 
@@ -70,20 +70,22 @@ end
 -- Setup Google Java Format
 local function setup_google_java_format()
     local jar_dir = home .. "/.local/share/nvim/google-java-format"
-    local jar_path = jar_dir .. "/google-java-format-1.17.0-all-deps.jar"
+    local google_java_format_version = "1.34.1"
+    local jar_path = jar_dir .. "/google-java-format-" .. google_java_format_version .. "-all-deps.jar"
 
     -- Create directory if it doesn't exist
     vim.fn.mkdir(jar_dir, "p")
 
     -- Download jar if it doesn't exist
     if vim.fn.filereadable(jar_path) == 0 then
-        vim.notify("Downloading Google Java Format v1.17.0...")
+        vim.notify("Downloading Google Java Format " .. google_java_format_version .. "...")
         local url =
-        "https://github.com/google/google-java-format/releases/download/v1.17.0/google-java-format-1.17.0-all-deps.jar"
+            "https://github.com/google/google-java-format/releases/download/v" ..
+            google_java_format_version .. "/google-java-format-" .. google_java_format_version .. "-all-deps.jar"
         local cmd = string.format("curl -L -o '%s' '%s'", jar_path, url)
         local result = vim.fn.system(cmd)
         if vim.v.shell_error == 0 then
-            vim.notify("Google Java Format v1.17.0 downloaded successfully")
+            vim.notify("Google Java Format v" .. google_java_format_version .. " downloaded successfully")
         else
             vim.notify("Failed to download Google Java Format: " .. result, vim.log.levels.ERROR)
             return nil
