@@ -105,9 +105,8 @@ install_deps
 
 # Home directory configs
 echo "🔗 Creating symlinks for home directory configs..."
-create_symlink "$DOTFILES_DIR/.tmux.conf" ~/.tmux.conf
+create_symlink "$DOTFILES_DIR/.tmux.conf" ~/.config/tmux.conf
 create_symlink "$DOTFILES_DIR/.gitconfig" ~/.gitconfig
-create_symlink "$DOTFILES_DIR/.zshrc" ~/.zshrc
 create_symlink ~/Downloads ~/Preuzimanja
 
 # .config directory configs
