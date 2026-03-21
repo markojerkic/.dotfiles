@@ -1,398 +1,302 @@
--- Set tabs to 2 spaces specifically for Java files
-vim.opt_local.tabstop = 2 -- Set tab character width to 2 spaces
-vim.opt_local.shiftwidth = 2 -- Set indentation width to 2 spaces
-vim.opt_local.expandtab = true -- Use spaces instead of tabs
-vim.opt_local.cmdheight = 1 -- more space in the neovim command line for displaying messages
+vim.opt_local.tabstop = 2
+vim.opt_local.shiftwidth = 2
+vim.opt_local.expandtab = true
 
-local fn = vim.fn
-local capabilities = vim.lsp.protocol.make_client_capabilities()
+local home = os.getenv("HOME")
+local root_markers = { ".git", "mvnw", "gradlew" }
 
-local status_cmp_ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-if not status_cmp_ok then
-	return
+local ok_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+if not ok_cmp then
+    return
 end
+
+local ok_jdtls, jdtls = pcall(require, "jdtls")
+if not ok_jdtls then
+    return
+end
+
+local root_dir = require("jdtls.setup").find_root(root_markers)
+if root_dir == "" then
+    return
+end
+
+local function first_glob(pattern)
+    local matches = vim.fn.glob(pattern, false, true)
+    if type(matches) == "table" and #matches > 0 then
+        return matches[1]
+    end
+    return ""
+end
+
+local function existing(path)
+    return path ~= "" and vim.fn.filereadable(path) == 1
+end
+
+local function get_lombok_javaagent()
+    local mason_lombok = home .. "/.local/share/nvim/mason/packages/jdtls/lombok.jar"
+    if existing(mason_lombok) then
+        return "-javaagent:" .. mason_lombok
+    end
+
+    local m2_lombok = first_glob(home .. "/.m2/repository/org/projectlombok/lombok/*/*.jar")
+    if existing(m2_lombok) then
+        return "-javaagent:" .. m2_lombok
+    end
+
+    return nil
+end
+
+local function get_bundles()
+    local bundles = {}
+
+    local java_dap = first_glob(home .. "/.local/share/nvim/mason/packages/java-debug-adapter/extension/server/*.jar")
+    if java_dap ~= "" then
+        table.insert(bundles, java_dap)
+    end
+
+    local java_test = vim.fn.glob(home .. "/.local/share/nvim/mason/packages/java-test/extension/server/*.jar", false,
+        true)
+    if type(java_test) == "table" then
+        vim.list_extend(bundles, java_test)
+    end
+
+    return bundles
+end
+
+local launcher = first_glob(home .. "/.local/share/nvim/mason/packages/jdtls/plugins/org.eclipse.equinox.launcher_*.jar")
+if not existing(launcher) then
+    vim.notify("jdtls launcher jar not found in mason", vim.log.levels.WARN)
+    return
+end
+
+local jdtls_config = home .. "/.local/share/nvim/mason/packages/jdtls/config_linux"
+if vim.fn.isdirectory(jdtls_config) ~= 1 then
+    vim.notify("jdtls config_linux not found in mason", vim.log.levels.WARN)
+    return
+end
+
+local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = false
 capabilities = cmp_nvim_lsp.default_capabilities(capabilities)
 
-local status, jdtls = pcall(require, "jdtls")
-if not status then
-	return
-end
--- Determine OS
-local home = os.getenv("HOME")
-WORKSPACE_PATH = home .. "/.cache/jdtls-compile/"
-CONFIG = "linux"
+local extended = jdtls.extendedClientCapabilities
+extended.resolveAdditionalTextEditsSupport = true
 
--- Find root of project
-local root_markers = { ".git", "mvnw", "gradlew" }
-local root_dir = require("jdtls.setup").find_root(root_markers)
-if root_dir == "" then
-	return
-end
+local workspace_dir = home
+    .. "/.cache/jdtls-compile/"
+    .. vim.fn.fnamemodify(root_dir, ":h:t")
+    .. "/"
+    .. vim.fn.fnamemodify(root_dir, ":t")
 
-local is_file_exist = function(path)
-	local f = io.open(path, "r")
-	return f ~= nil and io.close(f)
+local function open_dap_ui()
+    local ok_dapui, dapui = pcall(require, "dapui")
+    if ok_dapui then
+        dapui.open()
+    end
 end
 
-Get_java_dap = function()
-	local base_dir = home .. "/.local/share/nvim/mason/packages/java-debug-adapter/extension/server"
-	local launcher_versions = io.popen('find "' .. base_dir .. '" -type f -name "*.jar"')
-
-	if launcher_versions ~= nil then
-		local lb_i, lb_versions = 0, {}
-		for lb_version in launcher_versions:lines() do
-			lb_i = lb_i + 1
-			lb_versions[lb_i] = lb_version
-		end
-		launcher_versions:close()
-
-		if next(lb_versions) ~= nil then
-			local launcher_jar = fn.expand(string.format("%s", lb_versions[1]))
-			if is_file_exist(launcher_jar) then
-				return launcher_jar
-			end
-		end
-	end
-
-	return ""
-end
-
-Get_eclipse_equinix_launcher = function()
-	local base_dir = home .. "/.local/share/nvim/mason/packages/jdtls/plugins/"
-	local launcher_versions =
-		io.popen('find "' .. base_dir .. '" -type f -name "org.eclipse.equinox.launcher_1.7.*.jar"')
-
-	if launcher_versions ~= nil then
-		local lb_i, lb_versions = 0, {}
-		for lb_version in launcher_versions:lines() do
-			lb_i = lb_i + 1
-			lb_versions[lb_i] = lb_version
-		end
-		launcher_versions:close()
-
-		if next(lb_versions) ~= nil then
-			local launcher_jar = fn.expand(string.format("%s", lb_versions[1]))
-			if is_file_exist(launcher_jar) then
-				return string.format("%s", launcher_jar)
-			end
-		end
-	end
-
-	return ""
-end
-
-Get_lombok_javaagent = function()
-	if is_file_exist(home .. "/.local/share/nvim/mason/packages/jdtls/lombok.jar") then
-		return string.format("-javaagent:%s", home .. "/.local/share/nvim/mason/packages/jdtls/lombok.jar")
-	end
-
-	local lombok_dir = home .. "/.m2/repository/org/projectlombok/lombok/"
-	if is_file_exist(lombok_dir) == false then
-		return ""
-	end
-
-	local lombok_versions = io.popen('ls -1 "' .. lombok_dir .. '" | sort -r')
-	if lombok_versions ~= nil then
-		local lb_i, lb_versions = 0, {}
-		for lb_version in lombok_versions:lines() do
-			lb_i = lb_i + 1
-			lb_versions[lb_i] = lb_version
-		end
-		lombok_versions:close()
-		if next(lb_versions) ~= nil then
-			local lombok_jar = fn.expand(string.format("%s%s/*.jar", lombok_dir, lb_versions[1]))
-			if is_file_exist(lombok_jar) then
-				return string.format("-javaagent:%s", lombok_jar)
-			end
-		end
-	end
-	return ""
-end
-
-local get_bundles = function()
-	local bundles = {
-		vim.fn.glob(Get_java_dap(), true),
-	}
-	local test_runner_base_dir = home .. "/.local/share/nvim/mason/packages/java-test/extension/server/"
-	vim.list_extend(bundles, vim.split(vim.fn.glob(test_runner_base_dir .. "*.jar", true), "\n"))
-
-	return bundles
-end
-
-local extendedClientCapabilities = jdtls.extendedClientCapabilities
-extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
-
--- local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
-
-local workspace_dir = WORKSPACE_PATH
-	.. vim.fn.fnamemodify(root_dir, ":h:t")
-	.. "/"
-	.. vim.fn.fnamemodify(root_dir, ":t")
--- See `:help vim.lsp.start_client` for an overview of the supported `config` options.
 local config = {
-	-- The command that starts the language server
-	-- See: https://github.com/eclipse/eclipse.jdt.ls#running-from-the-command-line
-	cmd = {
-
-		-- 💀
-		"java", -- or '/path/to/java17_or_newer/bin/java'
-		-- depends on if `java` is in your $PATH env variable and if it points to the right version.
-
-		"-Declipse.application=org.eclipse.jdt.ls.core.id1",
-		"-Dosgi.bundles.defaultStartLevel=4",
-		"-Declipse.product=org.eclipse.jdt.ls.core.product",
-		"-Dlog.protocol=true",
-		"-Dlog.level=ALL",
-		"-Xms1g",
-		"--add-modules=ALL-SYSTEM",
-		"--add-opens",
-		"java.base/java.util=ALL-UNNAMED",
-		"--add-opens",
-		"java.base/java.lang=ALL-UNNAMED",
-		Get_lombok_javaagent(),
-
-		-- 💀
-		"-jar",
-		Get_eclipse_equinix_launcher(),
-
-		-- 💀
-		"-configuration",
-		home .. "/.local/share/nvim/mason/packages/jdtls/config_linux/",
-
-		"-data",
-		workspace_dir,
-	},
-	-- 💀
-	-- This is the default if not provided, you can remove it. Or adjust as needed.
-	-- One dedicated LSP server & client will be started per unique root_dir
-	root_dir = root_dir,
-	-- Here you can configure eclipse.jdt.ls specific settings
-	-- See https://github.com/eclipse/eclipse.jdt.ls/wiki/Running-the-JAVA-LS-server-from-the-command-line#initialize-request
-	-- for a list of options
-	settings = {
-		java = {
-			format = {
-				enabled = true,
-				settings = {
-					url = vim.fn.stdpath("config") .. "/formater/google-java-format.xml",
-					profile = "GoogleStyle",
-				},
-			},
-			inlayHints = {
-				parameterNames = {
-					enabled = "all",
-					exclusions = { "this" },
-				},
-			},
-		},
-
-		signatureHelp = { enabled = true },
-		completion = {
-			favoriteStaticMembers = {
-				"org.junit.jupiter.api.Assertions.*",
-				"java.util.Objects.requireNonNull",
-				"java.util.Objects.requireNonNullElse",
-				"org.mockito.Mockito.*",
-				"org.hamcrest.MatcherAssert.assertThat",
-				"org.hamcrest.Matchers.*",
-				"org.hamcrest.CoreMatchers.*",
-			},
-			importOrder = {
-				"java",
-				"jakarta",
-				"javax",
-				"com",
-				"org",
-			},
-		},
-	},
-	-- Language server `initializationOptions`
-	-- You need to extend the `bundles` with paths to jar files
-	-- if you want to use additional eclipse.jdt.ls plugins.
-	--
-	-- See https://github.com/mfussenegger/nvim-jdtls#java-debug-installation
-	--
-	-- If you don't plan on using the debugger or other eclipse.jdt.ls plugins you can remove this
-	init_options = {
-		bundles = get_bundles(),
-	},
-
-	on_attach = function(client, bufnr)
-		require("jdtls").setup_dap({ hotcodereplace = "auto" })
-	end,
+    cmd = {
+        "java",
+        "-Declipse.application=org.eclipse.jdt.ls.core.id1",
+        "-Dosgi.bundles.defaultStartLevel=4",
+        "-Declipse.product=org.eclipse.jdt.ls.core.product",
+        "-Dlog.protocol=true",
+        "-Dlog.level=ALL",
+        "-Xms1g",
+        "--add-modules=ALL-SYSTEM",
+        "--add-opens",
+        "java.base/java.util=ALL-UNNAMED",
+        "--add-opens",
+        "java.base/java.lang=ALL-UNNAMED",
+        "-jar",
+        launcher,
+        "-configuration",
+        jdtls_config,
+        "-data",
+        workspace_dir,
+    },
+    root_dir = root_dir,
+    capabilities = capabilities,
+    settings = {
+        java = {
+            format = {
+                enabled = true,
+                settings = {
+                    url = vim.fn.stdpath("config") .. "/formater/google-java-format.xml",
+                    profile = "GoogleStyle",
+                },
+            },
+            inlayHints = {
+                parameterNames = {
+                    enabled = "all",
+                    exclusions = { "this" },
+                },
+            },
+        },
+        signatureHelp = { enabled = true },
+        completion = {
+            favoriteStaticMembers = {
+                "org.junit.jupiter.api.Assertions.*",
+                "java.util.Objects.requireNonNull",
+                "java.util.Objects.requireNonNullElse",
+                "org.mockito.Mockito.*",
+                "org.hamcrest.MatcherAssert.assertThat",
+                "org.hamcrest.Matchers.*",
+                "org.hamcrest.CoreMatchers.*",
+            },
+            importOrder = { "java", "jakarta", "javax", "com", "org" },
+        },
+    },
+    init_options = {
+        bundles = get_bundles(),
+        extendedClientCapabilities = extended,
+    },
+    on_attach = function(_, bufnr)
+        pcall(jdtls.setup_dap, { hotcodereplace = "auto" })
+        require("marko.config.lsp").lsp_keymap({ buffer = bufnr, silent = true, remap = false })
+    end,
 }
 
--- This starts a new client & server,
--- or attaches to an existing client & server depending on the `root_dir`.
+local lombok = get_lombok_javaagent()
+if lombok then
+    table.insert(config.cmd, 13, lombok)
+end
+
 jdtls.start_or_attach(config)
 
-local opts = { silent = true, remap = false }
+vim.api.nvim_buf_create_user_command(0, "JdtCompile", function(args)
+    jdtls.compile(args.args)
+end, { nargs = "?", complete = "custom,v:lua.require'jdtls'._complete_compile" })
 
-local lsp_config = require("marko.config.lsp")
-lsp_config.lsp_keymap(opts)
+vim.api.nvim_buf_create_user_command(0, "JdtSetRuntime", function(args)
+    jdtls.set_runtime(args.args)
+end, { nargs = "?", complete = "custom,v:lua.require'jdtls'._complete_set_runtime" })
 
-vim.cmd(
-	"command! -buffer -nargs=? -complete=custom,v:lua.require'jdtls'._complete_compile JdtCompile lua require('jdtls').compile(<f-args>)"
-)
-vim.cmd(
-	"command! -buffer -nargs=? -complete=custom,v:lua.require'jdtls'._complete_set_runtime JdtSetRuntime lua require('jdtls').set_runtime(<f-args>)"
-)
-vim.cmd("command! -buffer JdtUpdateConfig lua require('jdtls').update_project_config()")
--- vim.cmd "command! -buffer JdtJol lua require('jdtls').jol()"
-vim.cmd("command! -buffer JdtBytecode lua require('jdtls').javap()")
--- vim.cmd "command! -buffer JdtJshell lua require('jdtls').jshell()"
-
-local MAVEN_DEBUG_OPTIONS = "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"
-local GRADLE_DEBUG_OPTIONS = "--debug-jvm"
-
-local function wrap_spring_jvm_args(args)
-	return ' -Dspring-boot.run.jvmArguments="' .. args .. '" '
-end
-
-function RunMavenDebug()
-	vim.ui.input({ prompt = "Run command: " }, function(command)
-		vim.cmd("silent !tmux neww " .. command .. wrap_spring_jvm_args(MAVEN_DEBUG_OPTIONS))
-	end)
-end
-
-function RunGradleDebug()
-	vim.ui.input({ prompt = "Run command: " }, function(command)
-		vim.cmd("silent !tmux neww " .. command .. " " .. GRADLE_DEBUG_OPTIONS)
-	end)
-end
-
-function Attach_to_java_debug()
-	local dap = require("dap")
-	local dapui = require("dapui")
-	vim.ui.input({ prompt = "Port: " }, function(port)
-		dap.configurations.java = {
-			{
-				type = "java",
-				request = "attach",
-				name = "Attach to the process",
-				hostName = "localhost",
-				port = port,
-			},
-		}
-		dap.continue()
-
-		dapui.setup()
-		dapui.open()
-	end)
-end
-
-local function wrap_dap_ui(runner)
-	local dap = require("dap")
-	local dapui = require("dapui")
-	runner(dap)
-	dapui.setup()
-	dapui.open()
-	dap.continue()
-end
-
-vim.api.nvim_create_user_command("TestMethod", function()
-	wrap_dap_ui(jdtls.test_nearest_method)
+vim.api.nvim_buf_create_user_command(0, "JdtUpdateConfig", function()
+    jdtls.update_project_config()
 end, {})
 
-vim.api.nvim_create_user_command("TestClass", function()
-	wrap_dap_ui(jdtls.test_class)
+vim.api.nvim_buf_create_user_command(0, "JdtBytecode", function()
+    jdtls.javap()
 end, {})
 
-vim.keymap.set("n", "<leader>dap", function()
-	Attach_to_java_debug()
-end, opts)
+local maven_debug_options = "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"
+local gradle_debug_options = "--debug-jvm"
+local dap_config_file = home .. "/.config/nvim-jdtls/dap.json"
+
+local function read_dap_configurations()
+    if vim.fn.filereadable(dap_config_file) ~= 1 then
+        return {}
+    end
+
+    local lines = vim.fn.readfile(dap_config_file)
+    local ok_decode, decoded = pcall(vim.fn.json_decode, table.concat(lines, "\n"))
+    if ok_decode and type(decoded) == "table" then
+        return decoded
+    end
+
+    return {}
+end
+
+local function write_dap_configurations(configurations)
+    vim.fn.mkdir(vim.fn.fnamemodify(dap_config_file, ":h"), "p")
+    local encoded = vim.fn.json_encode(configurations)
+    vim.fn.writefile({ encoded }, dap_config_file)
+end
+
+local function attach_to_java_debug()
+    local dap = require("dap")
+    vim.ui.input({ prompt = "Port: " }, function(port)
+        if not port or port == "" then
+            return
+        end
+
+        dap.configurations.java = {
+            {
+                type = "java",
+                request = "attach",
+                name = "Attach to process",
+                hostName = "localhost",
+                port = port,
+            },
+        }
+        dap.continue()
+        open_dap_ui()
+    end)
+end
+
+vim.api.nvim_buf_create_user_command(0, "RunMavenDebug", function()
+    vim.ui.input({ prompt = "Run command: " }, function(command)
+        if command and command ~= "" then
+            vim.fn.jobstart({ "tmux", "neww", command ..
+            ' -Dspring-boot.run.jvmArguments="' .. maven_debug_options .. '"' })
+        end
+    end)
+end, {})
+
+vim.api.nvim_buf_create_user_command(0, "RunGradleDebug", function()
+    vim.ui.input({ prompt = "Run command: " }, function(command)
+        if command and command ~= "" then
+            vim.fn.jobstart({ "tmux", "neww", command .. " " .. gradle_debug_options })
+        end
+    end)
+end, {})
+
+vim.api.nvim_buf_create_user_command(0, "AddDapConfig", function()
+    local main_class = vim.fn.input("Main class: ")
+    if main_class == "" then
+        return
+    end
+
+    local module = vim.fn.input("Module: ")
+    local configurations = read_dap_configurations()
+    table.insert(configurations, { mainClass = main_class, module = module })
+    write_dap_configurations(configurations)
+    vim.notify("Config added: " .. main_class, vim.log.levels.INFO)
+end, {})
+
+vim.api.nvim_buf_create_user_command(0, "DebugSpringBoot", function()
+    local configurations = read_dap_configurations()
+    local items = {}
+    for i, c in ipairs(configurations) do
+        table.insert(items, i .. ". " .. c.mainClass .. " - " .. (c.module or ""))
+    end
+
+    local selected = vim.fn.inputlist(items)
+    local picked = configurations[selected]
+    if not picked then
+        return
+    end
+
+    local dap = require("dap")
+    dap.configurations.java = {
+        {
+            mainClass = picked.mainClass,
+            projectName = picked.module,
+            name = "Launch " .. picked.mainClass,
+            request = "launch",
+            type = "java",
+        },
+    }
+
+    dap.continue()
+    open_dap_ui()
+end, {})
+
+vim.keymap.set("n", "<leader>dap", attach_to_java_debug, { silent = true, remap = false, buffer = 0 })
 vim.keymap.set("n", "<leader>dt", function()
-	local jdtls_dap = require("jdtls.dap")
-	wrap_dap_ui(jdtls_dap.pick_test)
-end, opts)
+    local jdtls_dap = require("jdtls.dap")
+    jdtls_dap.pick_test()
+    open_dap_ui()
+end, { silent = true, remap = false, buffer = 0 })
 
--- Read the json file at ~/.config/nvim-jdtls/dap.json
-local function get_dap_configurations()
-	local dap_config_file = home .. "/.config/nvim-jdtls/dap.json"
-	local dap_config = {}
-	if is_file_exist(dap_config_file) then
-		local file = io.open(dap_config_file, "r")
-
-		if file == nil then
-			return {}
-		end
-
-		local content = file:read("*a")
-		file:close()
-		dap_config = vim.fn.json_decode(content)
-	end
-	return dap_config
-end
-
--- Ask user to input main class, and module
--- Save that config to a json file at ~/.config/nvim-jdtls/dap.json
--- Update if already exists
-local function add_new_config()
-	local main_class = vim.fn.input("Main class: ")
-	local module = vim.fn.input("Module: ") or ""
-	local new_config = {
-		mainClass = main_class,
-		module = module,
-	}
-
-	local current_config_list = get_dap_configurations()
-
-	-- Append new config to the current list
-	table.insert(current_config_list, new_config)
-
-	-- save the file
-	local dap_config_file = home .. "/.config/nvim-jdtls/dap.json"
-
-	-- if file, or the parent directory does not exist, create it
-	if not is_file_exist(dap_config_file) then
-		os.execute("mkdir -p " .. home .. "/.config/nvim-jdtls")
-	end
-
-	-- if file does not exist, create it
-	local file = io.open(dap_config_file, "w")
-	if file == nil then
-		return
-	end
-
-	file:write(vim.fn.json_encode(current_config_list))
-	file:close()
-	print("Config added successfully " .. main_class)
-end
-
-vim.api.nvim_create_user_command("AddDapConfig", function()
-	add_new_config()
+vim.api.nvim_buf_create_user_command(0, "TestMethod", function()
+    jdtls.test_nearest_method()
+    open_dap_ui()
 end, {})
 
--- Create a command to list all the configurations
--- Ask user to select one
--- Use telescope to pick
-local function list_dap_configurations()
-	local dap_config = get_dap_configurations()
-	local config_list = {}
-	for i, available_config in ipairs(dap_config) do
-		table.insert(config_list, i .. ". " .. available_config.mainClass .. " - " .. available_config.module)
-	end
-
-	local selected_config = vim.fn.inputlist(config_list)
-	return dap_config[selected_config]
-end
-
-vim.api.nvim_create_user_command("DebugSpringBoot", function()
-	wrap_dap_ui(function(dap)
-		local selected_config = list_dap_configurations()
-		if selected_config == nil then
-			return
-		end
-
-		dap.configurations.java = {
-			{
-				mainClass = selected_config.mainClass,
-				projectName = selected_config.module,
-				name = "Launch " .. selected_config.mainClass,
-				request = "launch",
-				type = "java",
-			},
-		}
-	end)
+vim.api.nvim_buf_create_user_command(0, "TestClass", function()
+    jdtls.test_class()
+    open_dap_ui()
 end, {})
