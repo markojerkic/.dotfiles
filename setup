@@ -105,7 +105,7 @@ install_deps
 
 # Home directory configs
 echo "🔗 Creating symlinks for home directory configs..."
-create_symlink "$DOTFILES_DIR/.tmux.conf" ~/.config/tmux.conf
+create_symlink "$DOTFILES_DIR/.tmux.conf" ~/.tmux.conf
 create_symlink "$DOTFILES_DIR/.gitconfig" ~/.gitconfig
 create_symlink ~/Downloads ~/Preuzimanja
 
@@ -195,7 +195,7 @@ echo ""
 echo "📋 Next steps:"
 echo "   1. Restart your shell or run: source ~/.zshrc (or ~/.config/fish/config.fish)"
 echo "   2. If you were added to the input group, log out and back in"
-echo "   3. Open tmux and press Ctrl+B then I to install tmux plugins"
+echo "   3. Open tmux and press your tmux prefix + I to install tmux plugins"
 echo "   4. Configure your Hyprland mouse bindings if needed"
 echo ""
 echo "🔧 Tools installed:"
