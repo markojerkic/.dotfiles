@@ -21,6 +21,7 @@ fi
 if [ "$#" -ne 1 ]; then
     tmux select-window -n
 fi
+
 if [ -d "$HOME/.config/omarchy" ] && [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]; then
     echo "DEBUG: Detected omarchy + Hyprland setup"
     # omarchy setup - link the selected wallpaper and use swaybg
@@ -84,6 +85,34 @@ if [ -d "$HOME/.config/omarchy" ] && [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]; th
         ls -la "$lockscreen_path"
     else
         echo "ERROR: Failed to create lockscreen image at $lockscreen_path"
+    fi
+elif [ -d /mnt/c/ ] && command -v wslpath >/dev/null 2>&1 && command -v wslvar >/dev/null 2>&1; then
+    windows_userprofile=""
+    while IFS= read -r line; do
+        if [[ "$line" =~ ^[A-Za-z]:\\ ]]; then
+            windows_userprofile="$line"
+        fi
+    done < <(wslvar USERPROFILE 2>/dev/null)
+
+    windows_profile_dir=""
+    if [ -n "$windows_userprofile" ]; then
+        windows_profile_dir=$(wslpath "$windows_userprofile" 2>/dev/null)
+    fi
+
+    if [ -n "$windows_profile_dir" ] && [ -d "$windows_profile_dir/AppData/Local/Packages" ]; then
+        terminal_dir=$(find "$windows_profile_dir/AppData/Local/Packages/" -maxdepth 1 -type d -name "Microsoft.WindowsTerminal*")
+    else
+        terminal_dir=""
+    fi
+    settings_file="$terminal_dir/LocalState/settings.json"
+
+    if [ -n "$windows_profile_dir" ] && [ -n "$terminal_dir" ] && [ -f "$settings_file" ]; then
+        chmod +w "$settings_file"
+        jq --arg new_image "$(wslpath -w "$selected" | sed 's/\\/\\\\/g')" \
+            '.profiles.list[].backgroundImage = $new_image' "$settings_file" > /tmp/wterminal.json && \
+            mv /tmp/wterminal.json "$settings_file"
+    else
+        echo "WARNING: Windows Terminal settings.json not found"
     fi
 else
     # Compute the average color of the image as a hex value

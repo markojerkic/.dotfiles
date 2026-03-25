@@ -1,23 +1,39 @@
 #!/usr/bin/env bash
 
-if [ -d /mnt/c/ ]; then
-    # Find Windows Terminal directory
-    terminal_dir=$(find "$(wslpath $(wslvar USERPROFILE))/AppData/Local/Packages/" -maxdepth 1 -type d -name "Microsoft.WindowsTerminal*")
-    # Construct path to settings.json
-    settings_file="$terminal_dir/LocalState/settings.json"
-    # Ensure write permissions
-    chmod +w "$settings_file"
-    # Use jq to modify the JSON and save to a temporary file
-    opacity=$(jq '.profiles.list[2].backgroundImageOpacity' "$settings_file")
-    # Ensure opacity is treated as a number
-    opacity=${opacity//[^0-9]/}
-    if [ "$opacity" -eq "0" ]; then
-        jq '.profiles.list[].backgroundImageOpacity = 0.2' "$settings_file" > temp_settings.json
-    else
-        jq '.profiles.list[].backgroundImageOpacity = 0' "$settings_file" > temp_settings.json
+if [ -d /mnt/c/ ] && command -v wslpath >/dev/null 2>&1 && command -v wslvar >/dev/null 2>&1; then
+    windows_userprofile=""
+    while IFS= read -r line; do
+        if [[ "$line" =~ ^[A-Za-z]:\\ ]]; then
+            windows_userprofile="$line"
+        fi
+    done < <(wslvar USERPROFILE 2>/dev/null)
+
+    windows_profile_dir=""
+    if [ -n "$windows_userprofile" ]; then
+        windows_profile_dir=$(wslpath "$windows_userprofile" 2>/dev/null)
     fi
-    # Replace original settings.json with modified version
-    mv temp_settings.json "$settings_file"
+
+    if [ -n "$windows_profile_dir" ] && [ -d "$windows_profile_dir/AppData/Local/Packages" ]; then
+        terminal_dir=$(find "$windows_profile_dir/AppData/Local/Packages/" -maxdepth 1 -type d -name "Microsoft.WindowsTerminal*")
+    else
+        terminal_dir=""
+    fi
+
+    settings_file="$terminal_dir/LocalState/settings.json"
+
+    if [ -n "$terminal_dir" ] && [ -f "$settings_file" ]; then
+        chmod +w "$settings_file"
+        opacity=$(jq -r '.profiles.list[2].backgroundImageOpacity // 0' "$settings_file")
+        temp_settings_file=$(mktemp)
+        if [ "$opacity" = "0" ]; then
+            jq '.profiles.list[].backgroundImageOpacity = 0.2' "$settings_file" > "$temp_settings_file"
+        else
+            jq '.profiles.list[].backgroundImageOpacity = 0' "$settings_file" > "$temp_settings_file"
+        fi
+        mv "$temp_settings_file" "$settings_file"
+    else
+        echo "WARNING: Windows Terminal settings.json not found"
+    fi
 else
     # Change line background-opacity in ~/dev/.dotfiles/.config/ghostty/config
     # Extract opacity value
@@ -32,4 +48,3 @@ else
         sed -i 's/background-opacity = 0.85/background-opacity = 1/' ~/dev/.dotfiles/.config/ghostty/config
     fi
 fi
-
