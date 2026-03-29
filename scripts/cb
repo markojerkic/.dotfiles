@@ -8,7 +8,7 @@ else
         available_height=$(tput lines)
         width_x_height="${available_width}x${available_height}"
         selected=$(find ~/Slike/WP -maxdepth 1 -type f -name "*.jpg" | \
-            fzf --preview "chafa {} --size $width_x_height --symbols vhalf --stretch" --preview-window=right:70%:wrap)
+            fzf --preview "chafa {} -f symbols --size $width_x_height --symbols vhalf --stretch" --preview-window=right:70%:wrap)
     else
         read selected
     fi
