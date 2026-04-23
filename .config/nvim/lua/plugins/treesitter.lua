@@ -1,21 +1,21 @@
 return {
     {
         "nvim-treesitter/nvim-treesitter",
+        main = "nvim-treesitter",
         version = false,
-        cmd = { "TSUpdateSync", "TSUpdate", "TSInstall" },
+        branch = "main",
+        cmd = { "TSUpdateSync", "TSUpdate", "TSInstall", "TSUninstall" },
         dependencies = {
             "nvim-treesitter/nvim-treesitter-context",
-            "nvim-treesitter/nvim-treesitter-textobjects"
+            "nvim-treesitter/nvim-treesitter-textobjects",
         },
         build = ":TSUpdate",
         lazy = false,
-
-        ---@type TSConfig
-        ---@diagnostic disable-next-line: missing-fields
         opts = {
-            highlight = { enable = true },
-            indent = { enable = true },
-            ensure_installed = {
+            install_dir = vim.fn.stdpath("data") .. "/site",
+        },
+        init = function()
+            local ensure_installed = {
                 "bash",
                 "c",
                 "go",
@@ -27,7 +27,6 @@ return {
                 "javascript",
                 "jsdoc",
                 "json",
-                "jsonc",
                 "lua",
                 "luadoc",
                 "luap",
@@ -44,50 +43,81 @@ return {
                 "xml",
                 "yaml",
                 "angular",
-                "java"
-            },
-            incremental_selection = {
-                enable = true,
-                keymaps = {
-                    init_selection = "<C-space>",
-                    node_incremental = "<C-space>",
-                    scope_incremental = false,
-                    node_decremental = "<bs>",
-                },
-            },
-            textobjects = {
-                move = {
-                    enable = true,
-                    goto_next_start = { ["]f"] = "@function.outer", ["]c"] = "@class.outer" },
-                    goto_next_end = { ["]F"] = "@function.outer", ["]C"] = "@class.outer" },
-                    goto_previous_start = { ["[f"] = "@function.outer", ["[c"] = "@class.outer" },
-                    goto_previous_end = { ["[F"] = "@function.outer", ["[C"] = "@class.outer" },
-                },
+                "java",
+            }
+
+            vim.api.nvim_create_autocmd("FileType", {
+                callback = function(args)
+                    pcall(vim.treesitter.start, args.buf)
+                    vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+                end,
+            })
+
+            vim.api.nvim_create_autocmd("User", {
+                pattern = "VeryLazy",
+                once = true,
+                callback = function()
+                    local treesitter = require("nvim-treesitter")
+                    local installed = treesitter.get_installed()
+                    local missing = vim.iter(ensure_installed)
+                        :filter(function(lang)
+                            return not vim.tbl_contains(installed, lang)
+                        end)
+                        :totable()
+
+                    if #missing > 0 then
+                        treesitter.install(missing)
+                    end
+                end,
+            })
+        end,
+        config = function(_, opts)
+            require("nvim-treesitter").setup(opts)
+        end,
+    },
+    {
+        "nvim-treesitter/nvim-treesitter-textobjects",
+        main = "nvim-treesitter-textobjects",
+        branch = "main",
+        lazy = false,
+        opts = {
+            move = {
+                set_jumps = true,
             },
         },
+        config = function(_, opts)
+            require("nvim-treesitter-textobjects").setup(opts)
 
-        config = function(i, opts)
-            if type(opts.ensure_installed) == "table" then
-                ---@type table<string, boolean>
-                local added = {}
-                opts.ensure_installed = vim.tbl_filter(function(lang)
-                    if added[lang] then
-                        return false
-                    end
-                    added[lang] = true
-                    return true
-                end, opts.ensure_installed)
-            end
-            local configs = require("nvim-treesitter.configs")
-            configs.setup(opts)
-            vim.schedule(function()
-                require("lazy").load({ plugins = { "nvim-treesitter-textobjects" } })
+            local move = require("nvim-treesitter-textobjects.move")
+
+            vim.keymap.set({ "n", "x", "o" }, "]f", function()
+                move.goto_next_start("@function.outer", "textobjects")
+            end)
+            vim.keymap.set({ "n", "x", "o" }, "]c", function()
+                move.goto_next_start("@class.outer", "textobjects")
+            end)
+            vim.keymap.set({ "n", "x", "o" }, "]F", function()
+                move.goto_next_end("@function.outer", "textobjects")
+            end)
+            vim.keymap.set({ "n", "x", "o" }, "]C", function()
+                move.goto_next_end("@class.outer", "textobjects")
+            end)
+            vim.keymap.set({ "n", "x", "o" }, "[f", function()
+                move.goto_previous_start("@function.outer", "textobjects")
+            end)
+            vim.keymap.set({ "n", "x", "o" }, "[c", function()
+                move.goto_previous_start("@class.outer", "textobjects")
+            end)
+            vim.keymap.set({ "n", "x", "o" }, "[F", function()
+                move.goto_previous_end("@function.outer", "textobjects")
+            end)
+            vim.keymap.set({ "n", "x", "o" }, "[C", function()
+                move.goto_previous_end("@class.outer", "textobjects")
             end)
         end,
     },
     {
         "davidmh/mdx.nvim",
-        dependencies = { "nvim-treesitter/nvim-treesitter" }
-    }
-
+        dependencies = { "nvim-treesitter/nvim-treesitter" },
+    },
 }
