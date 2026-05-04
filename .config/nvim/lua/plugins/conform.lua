@@ -7,6 +7,28 @@ return {
         local java_formatter_jar = java_setup.jar_path
         local java21_path = java_setup.java_path
 
+        vim.api.nvim_create_user_command("FormatDisable", function(args)
+            if args.bang then
+                vim.b.disable_autoformat = true
+            else
+                vim.g.disable_autoformat = true
+            end
+        end, {
+            desc = "Disable format on save",
+            bang = true,
+        })
+
+        vim.api.nvim_create_user_command("FormatEnable", function(args)
+            if args.bang then
+                vim.b.disable_autoformat = false
+            else
+                vim.g.disable_autoformat = false
+            end
+        end, {
+            desc = "Enable format on save",
+            bang = true,
+        })
+
         require("conform").setup({
             formatters_by_ft = {
                 lua = { "stylua", lsp_format = "fallback" },
@@ -54,6 +76,10 @@ return {
                 },
             },
             format_after_save = function(bufnr)
+                if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+                    return false
+                end
+
                 local file_ext = vim.api.nvim_buf_get_option(bufnr, "filetype")
                 if file_ext == "sql" then
                     return false
