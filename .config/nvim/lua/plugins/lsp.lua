@@ -132,7 +132,7 @@ return {
             })
 
             require("mason-lspconfig").setup({
-                ensure_installed = { "eslint", "jdtls", "ts_ls", "angularls", "lua_ls", "gopls", "tailwindcss" },
+                ensure_installed = { "eslint", "jdtls", "ts_ls", "lua_ls", "gopls", "tailwindcss" },
                 handlers = {
                     -- this first function is the "default handler"
                     -- it applies to every language server without a "custom handler"
