@@ -1,32 +1,3 @@
-vim.lsp.config('ts_ls', {
-    settings = {
-        typescript = {
-            inlayHints = {
-                includeInlayParameterNameHints = "all",
-                includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-                includeInlayFunctionParameterTypeHints = false,
-                includeInlayVariableTypeHints = false,
-                includeInlayVariableTypeHintsWhenTypeMatchesName = false,
-                includeInlayPropertyDeclarationTypeHints = false,
-                includeInlayFunctionLikeReturnTypeHints = false,
-                includeInlayEnumMemberValueHints = false,
-            },
-        },
-        javascript = {
-            inlayHints = {
-                includeInlayParameterNameHints = "all",
-                includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-                includeInlayFunctionParameterTypeHints = false,
-                includeInlayVariableTypeHints = false,
-                includeInlayVariableTypeHintsWhenTypeMatchesName = false,
-                includeInlayPropertyDeclarationTypeHints = false,
-                includeInlayFunctionLikeReturnTypeHints = false,
-                includeInlayEnumMemberValueHints = true,
-            },
-        },
-    },
-})
-
 return {
     {
         "williamboman/mason.nvim",
@@ -118,6 +89,67 @@ return {
         config = function()
             -- This is where all the LSP shenanigans will live
             local keymaps = require("marko.config.lsp")
+            local ts_hint_settings = {
+                settings = {
+                    typescript = {
+                        inlayHints = {
+                            includeInlayParameterNameHints = "all",
+                            includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+                            includeInlayFunctionParameterTypeHints = false,
+                            includeInlayVariableTypeHints = false,
+                            includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+                            includeInlayPropertyDeclarationTypeHints = false,
+                            includeInlayFunctionLikeReturnTypeHints = false,
+                            includeInlayEnumMemberValueHints = false,
+                        },
+                    },
+                    javascript = {
+                        inlayHints = {
+                            includeInlayParameterNameHints = "all",
+                            includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+                            includeInlayFunctionParameterTypeHints = false,
+                            includeInlayVariableTypeHints = false,
+                            includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+                            includeInlayPropertyDeclarationTypeHints = false,
+                            includeInlayFunctionLikeReturnTypeHints = false,
+                            includeInlayEnumMemberValueHints = true,
+                        },
+                    },
+                },
+            }
+            local tsgo_hint_settings = {
+                settings = {
+                    typescript = {
+                        inlayHints = {
+                            enumMemberValues = { enabled = false },
+                            functionLikeReturnTypes = { enabled = false },
+                            parameterNames = {
+                                enabled = "all",
+                                suppressWhenArgumentMatchesName = false,
+                            },
+                            parameterTypes = { enabled = false },
+                            propertyDeclarationTypes = { enabled = false },
+                            variableTypes = { enabled = false },
+                        },
+                    },
+                    javascript = {
+                        inlayHints = {
+                            enumMemberValues = { enabled = true },
+                            functionLikeReturnTypes = { enabled = false },
+                            parameterNames = {
+                                enabled = "all",
+                                suppressWhenArgumentMatchesName = false,
+                            },
+                            parameterTypes = { enabled = false },
+                            propertyDeclarationTypes = { enabled = false },
+                            variableTypes = { enabled = false },
+                        },
+                    },
+                },
+            }
+
+            vim.lsp.config('ts_ls', ts_hint_settings)
+            vim.lsp.config('tsgo', tsgo_hint_settings)
 
             vim.api.nvim_create_autocmd('LspAttach', {
                 desc = 'LSP actions',
@@ -132,7 +164,7 @@ return {
             })
 
             require("mason-lspconfig").setup({
-                ensure_installed = { "eslint", "jdtls", "ts_ls", "lua_ls", "gopls", "tailwindcss" },
+                ensure_installed = { "eslint", "jdtls", "tsgo", "lua_ls", "gopls", "tailwindcss" },
                 handlers = {
                     -- this first function is the "default handler"
                     -- it applies to every language server without a "custom handler"
@@ -141,7 +173,11 @@ return {
                     end,
 
                     ts_ls = function()
-                        require("lspconfig").ts_ls.setup({})
+                        require("lspconfig").ts_ls.setup(ts_hint_settings)
+                    end,
+
+                    tsgo = function()
+                        require("lspconfig").tsgo.setup(tsgo_hint_settings)
                     end,
 
                     -- this is the "custom handler" for `lua_ls`
